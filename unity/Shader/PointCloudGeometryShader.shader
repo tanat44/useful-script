@@ -1,3 +1,5 @@
+// THIS GEOMETRY SHADER IS NOT SUPPORTED BY WEBGL
+
 Shader "Geometry/PointCloud"
 {
     Properties

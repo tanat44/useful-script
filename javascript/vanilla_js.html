@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<button id="button0">Alert</button><br/>
+<button id="button1">Button</button><br/>
+<button id="button2">Copy</button><br/>
+<button id="button3">Html</button><br/>
+input1 <input type="text" id="input1"/><br/>
+input2 <input type="text" id="input2"/><br/><hr/>
+<div id="output"></div>
+
+<script>
+    const input1 = document.getElementById("input1");
+    const input2 = document.getElementById("input2");
+
+    document.getElementById('button0').onclick = function() {
+        alert("button was clicked");
+    };
+
+    document.getElementById('button1').onclick = function() {
+        console.log("button1 ", 8888)
+    };
+
+    document.getElementById('button2').onclick = function() {
+        let x = input1.value + input2.value
+        console.log("A sum is", x)
+        let y = parseInt(input1.value) + parseInt(input2.value)
+        console.log("B sum is", y)
+        let z = doSomething(input1.value, input2.value)
+        console.log("Call function", z)
+    };
+
+    document.getElementById('button3').onclick = function() {
+        document.getElementById('output').innerHTML = "NEW TEXT IS HERE"
+    };
+
+    function doSomething(x, y) {
+        return parseFloat(x) / y;
+    }
+
+
+
+</script>
+
+</body>
+</html>
