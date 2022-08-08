@@ -1,33 +1,30 @@
-const crypto = require('crypto');
 const express = require('express');
 const { createServer } = require('http');
 const WebSocket = require('ws');
 
 const app = express();
-const port = 3000;
+const port = 5001;
 
 const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const StorageManager = require('./StorageManager/StorageManager')
-const Box = require('./StorageManager/Box');
-const { start } = require('repl');
-var storageManager = new StorageManager()
-storageManager.addBox(new Box(1, 'fruit'))
-storageManager.addBox(new Box(2, 'iphone'))
-storageManager.startEmulation()
+// const StorageManager = require('./StorageManager/StorageManager')
+// const Box = require('./StorageManager/Box');
+// var storageManager = new StorageManager()
+// storageManager.addBox(new Box(1, 'fruit'))
+// storageManager.addBox(new Box(2, 'iphone'))
+// storageManager.startEmulation()
+// storageManager.addSubscriber(ws)
 
 wss.on('connection', function (ws) {
   const uid = getUniqueID()
   console.log("client joined", uid);
   ws.uid = uid
-  storageManager.addSubscriber(ws)
 
   ws.on('message', function (data) {
     if (typeof (data) === "string") {
       // client sent a string
       console.log("string received from client -> '" + data + "'");
-
     } else {
       console.log("binary received from client -> " + Array.from(data).join(", ") + "");
     }

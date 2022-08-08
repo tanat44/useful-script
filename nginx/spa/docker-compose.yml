@@ -1,0 +1,7 @@
+version: "3.9"
+
+services:
+  fleetbuilder:
+    build: .
+    ports:
+      - "8888:80"
