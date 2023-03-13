@@ -116,14 +116,30 @@ static async Task RunManyAsync3(int numThread)
     Task.WaitAll(tasks.ToArray());
     Console.WriteLine($"RunManyAsync3 takes {stopwatch.Elapsed.TotalSeconds}");
 }
+static async Task RunManyAsync4(int numThread)
+{
+    Stopwatch stopwatch = new Stopwatch();
+    stopwatch.Start();
+    List<Task> tasks = new List<Task>();
+
+    for (int i = 0; i < numThread; i++)
+    {
+        var t = new Task(()=>fibonacci(N_TH));
+        t.Start();
+        tasks.Add(t);
+    }
+    Task.WaitAll(tasks.ToArray());
+    Console.WriteLine($"RunManyAsync3 takes {stopwatch.Elapsed.TotalSeconds}");
+}
 static async void Main()
 {
     RunOneThread();
     RunManyThreads(NUM_THREAD);
     //await RunOneAsync();
     //await RunOneAsync2();
-    await RunOneAsync3();
+    //await RunOneAsync3();
     await RunManyAsync3(NUM_THREAD);
+    await RunManyAsync4(NUM_THREAD);
 }
 
 Main();
