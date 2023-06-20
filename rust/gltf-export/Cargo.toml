@@ -1,0 +1,11 @@
+[package]
+name = "rust-test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gltf = "1.2.0"
+gltf-json = "1.2.0"
+ply-rs = "0.1.3"
