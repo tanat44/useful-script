@@ -73,26 +73,36 @@ fn to_padded_byte(vertices: Vec<Vertex>, indices: Vec<u16>) -> Vec<u8> {
 }
 
 fn export(output: Output) {
+    let dx: f32 = 0.05;
+
     let triangle_vertices = vec![
         Vertex {
-            position: [0.0, 0.5, 0.0],
+            position: [0.0, 0.5, 0.0], // top
             color: [1.0, 0.0, 0.0],
         },
         Vertex {
-            position: [-0.5, -0.5, 0.0],
+            position: [-0.5, -0.5, 0.0], // left
             color: [0.0, 1.0, 0.0],
         },
         Vertex {
-            position: [0.5, -0.5, 0.0],
+            position: [0.5, -0.5, 0.0], // right
             color: [1.0, 1.0, 1.0],
         },
         Vertex {
-            position: [1.0, 0.5, 0.0],
+            position: [0.0 + dx, 0.5, 0.0], // top
+            color: [1.0, 0.0, 0.0],
+        },
+        Vertex {
+            position: [0.5 + dx, -0.5, 0.0], // right
             color: [1.0, 1.0, 1.0],
+        },
+        Vertex {
+            position: [1.0 + dx, 0.5, 0.0],
+            color: [1.0, 0.0, 1.0],
         },
     ];
 
-    let indices: Vec<u16> = vec![0, 1, 2, 0, 2, 3];
+    let indices: Vec<u16> = vec![0, 1, 2, 3, 4, 5];
 
     let (min, max) = bounding_coords(&triangle_vertices);
 
@@ -147,7 +157,7 @@ fn export(output: Output) {
     };
     let colors = json::Accessor {
         buffer_view: Some(json::Index::new(0)),
-        byte_offset: (2 * mem::size_of::<f32>()) as u32,
+        byte_offset: (3 * mem::size_of::<f32>()) as u32,
         count: triangle_vertices.len() as u32,
         component_type: Valid(json::accessor::GenericComponentType(
             json::accessor::ComponentType::F32,
