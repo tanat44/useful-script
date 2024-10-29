@@ -3,38 +3,41 @@ volumes:
 
 services:
   mysql:
-    image: mysql:5.7
+    image: mysql:8.4.2
     restart: always
     environment:
-      MYSQL_DATABASE: 'db'
-      MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: password
     ports:
       - '3306:3306'
-    expose:
-      - '3306'
     volumes:
       - my-db:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
   keycloak:
-    depends_on:
-      mysql:
-        condition: service_healthy
-    image: quay.io/keycloak/keycloak:22.0.3
+    image: quay.io/keycloak/keycloak:26.0.1
+    container_name: keycloak
     environment:
-      DB: MYSQL
-      DB_URL_HOST: mysql
-      DB_SCHEMA: keycloak
-      DB_USERNAME: keycloak
-      DB_PASSWORD: keycloak
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME_STRICT: 'false'
-      KC_HTTP_RELATIVE_PATH: /keycloak
-      KC_PROXY: edge
+      KC_DB: mysql
+      KC_DB_SCHEMA: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: 'true'
+      KC_HEALTH_ENABLED: 'true'
+    command: start-dev
+    depends_on:
+      - mysql
     ports:
-      - 8080:8080
-      - 8443:8443
-    command:
-      - start
+      - '8080:8080'
