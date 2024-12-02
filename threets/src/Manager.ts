@@ -1,6 +1,7 @@
 // @ts-ignore
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { PerspectiveCamera, Raycaster, Scene, WebGLRenderer } from "three";
+import Stats from "three/examples/jsm/libs/stats.module";
 import * as THREE from "three";
 
 export class Manager {
@@ -9,9 +10,11 @@ export class Manager {
   raycaster: Raycaster;
   renderer: WebGLRenderer;
   orbitControl: OrbitControls;
+  stats: Stats;
 
   constructor() {
     this.raycaster = new THREE.Raycaster();
+    this.stats = new Stats();
     this.setupScene();
     this.setupLighting();
     this.setupOrbitControl();
@@ -23,7 +26,18 @@ export class Manager {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const cube = new THREE.Mesh(geometry, material);
-    this.scene.add(cube);
+    const SPACE = 10;
+    const SIZE = 0.1;
+    for (let i = 0; i < 10000; ++i) {
+      const object = cube.clone();
+      object.position.set(
+        Math.random() * SPACE,
+        Math.random() * SPACE,
+        Math.random() * SPACE
+      );
+      object.scale.set(SIZE, SIZE, SIZE);
+      this.scene.add(object);
+    }
   }
 
   setupLighting() {
@@ -59,8 +73,10 @@ export class Manager {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
-
     document.body.appendChild(this.renderer.domElement);
+
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
 
     window.addEventListener("resize", () => this.onWindowResize(this));
   }
@@ -87,5 +103,6 @@ export class Manager {
   animate() {
     requestAnimationFrame(() => this.animate());
     this.render();
+    this.stats.update();
   }
 }
