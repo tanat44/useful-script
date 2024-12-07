@@ -8,6 +8,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       default-authentication-plugin: caching_sha2_password
+      TZ: Asia/Bangkok
     ports:
       - '3306:3306'
     volumes:
