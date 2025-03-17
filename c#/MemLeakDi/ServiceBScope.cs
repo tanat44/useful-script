@@ -8,6 +8,7 @@ namespace MemLeakDi
         List<string>? bigList;
         int _id = -1;
         static int id = 0;
+        System.Timers.Timer timer;
         public ServiceBScoped() {
             _id = id++;
             Console.WriteLine($"ServiceB: Created {_id}");
@@ -16,15 +17,15 @@ namespace MemLeakDi
             {
                 bigList.Add(bigList[bigList.Count - 1] + bigList[bigList.Count - 1]);
             }
-            //var timer = new System.Timers.Timer(30000);
-            //timer.Elapsed += OnTimedEvent;
-            //timer.AutoReset = true;
-            //timer.Enabled = true;
+            timer = new System.Timers.Timer(10000);
+            timer.Elapsed += OnTimedEvent;
+            timer.AutoReset = true;
+            timer.Enabled = true;
         }
 
         private void OnTimedEvent(object? sender, ElapsedEventArgs e)
         {
-            bigList = null;
+            Console.WriteLine($"ServiceB: Tick {_id} Count {bigList.Count}");
         }
 
         public void Dispose()
@@ -41,6 +42,10 @@ namespace MemLeakDi
                 return 0;
             }
             return bigList.Count;
+        }
+
+        ~ServiceBScoped() {
+            Console.WriteLine($"ServiceB: Destructed {_id}");
         }
 
     }
