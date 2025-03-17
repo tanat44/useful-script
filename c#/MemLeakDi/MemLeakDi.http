@@ -1,0 +1,6 @@
+@MemLeakDi_HostAddress = http://localhost:5261
+
+GET {{MemLeakDi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
