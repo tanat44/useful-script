@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DI
+// DI A+B
 builder.Services.AddScoped<IAService, AService>();
 builder.Services.AddScoped<IBService, BService>();
 builder.Services.AddSingleton<Func<IAService>>((provider) => () =>
@@ -20,6 +20,10 @@ builder.Services.AddSingleton<Func<IAService>>((provider) => () =>
 });
 builder.Services.AddScoped<ISpecialWork, MyHostedService>();
 builder.Services.AddHostedService<MyHostedService>();
+
+// DI C
+builder.Services.AddScoped<ICService, CService>();
+builder.Services.AddScoped<ICService, CService>();  // AddScoped multiple times don't create problem
 
 var app = builder.Build();
 
