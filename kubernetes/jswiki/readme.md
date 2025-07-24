@@ -1,0 +1,1 @@
+helm install jswiki requarks/wiki --namespace jswiki

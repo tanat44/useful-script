@@ -1,0 +1,21 @@
+volumes:
+  ibmmqdata:
+    driver: local
+
+services:
+  ibmmq: # FOR FIS DEVELOPMENT ONLY
+    container_name: ibmmq
+    image: icr.io/ibm-messaging/mq:9.2.0.0-r1
+    restart: always
+    ports:
+      - "1414:1414"
+      - "9443:9443"
+    volumes:
+      - ibmmqdata:/mnt/mqm
+    environment:
+      - LICENSE=accept
+      - MQ_QMGR_NAME=QM1
+      - MQ_APP_USER=user
+      - MQ_APP_PASSWORD=test1234
+      - MQ_ADMIN_USER=admin
+      - MQ_ADMIN_PASSWORD=test1234

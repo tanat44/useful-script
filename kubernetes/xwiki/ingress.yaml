@@ -1,0 +1,20 @@
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: xwiki
+  namespace: xwiki
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: xwiki.tanat44.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: xwiki
+            port:
+              number: 80

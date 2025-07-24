@@ -1,0 +1,16 @@
+services:
+  my-init:
+    image: bash:latest
+    command: ["bash", "/run.sh"]
+    volumes:
+      - ./run.sh:/run.sh
+      - ./env:/env
+
+  my-service:
+    image: bash:latest
+    depends_on:
+      my-init:
+        condition: service_completed_successfully
+    command: >
+      bash -c "echo Hi"
+      
