@@ -110,25 +110,28 @@ metadata:
   labels:
     k8s-app: filebeat
 data:
-  filebeat.yml: |-
-    filebeat.inputs:
-    - type: filestream
-      id: kubernetes-container-logs
-      paths:
-        - /var/log/containers/*.log
-      parsers:
-        - container: ~
-      prospector:
-        scanner:
-          fingerprint.enabled: true
-          symlinks: true
-      file_identity.fingerprint: ~
-      processors:
-        - add_kubernetes_metadata:
-            host: ${NODE_NAME}
-            matchers:
-            - logs_path:
-                logs_path: "/var/log/containers/"
+  filebeat.autodiscover:
+    providers:
+      - type: kubernetes
+        node: ${NODE_NAME}
+        templates:
+          - condition:
+              contains:
+                kubernetes.container.name: "no-json-logging"
+            config:
+              - type: container
+                paths:
+                  - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+          - condition:
+              contains:
+                kubernetes.container.name: "json-logging"
+            config:
+              - type: container
+                paths:
+                  - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+                json.keys_under_root: true
+                json.add_error_key: true
+                json.message_key: message
 
     processors:
       - add_cloud_metadata:
