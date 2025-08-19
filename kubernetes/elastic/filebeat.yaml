@@ -110,10 +110,12 @@ metadata:
   labels:
     k8s-app: filebeat
 data:
-  filebeat.autodiscover:
-    providers:
+  filebeat.yml: |-
+    filebeat.autodiscover:
+      providers:
       - type: kubernetes
         node: ${NODE_NAME}
+        hints.enabled: true
         templates:
           - condition:
               contains:
