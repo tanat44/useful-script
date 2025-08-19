@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: vanilla
+  - host: vanilla.cube.tanat44.com
     http:
       paths:
       - path: /kibana
@@ -29,7 +29,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: vanilla
+  - host: vanilla.cube.tanat44.com
     http:
       paths:
       - path: /elastic
