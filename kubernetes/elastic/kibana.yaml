@@ -1,0 +1,31 @@
+---
+# Source: eck-stack/charts/eck-kibana/templates/kibana.yaml
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: es-kb-quickstart-eck-kibana
+  labels:
+    app.kubernetes.io/name: eck-kibana
+    app.kubernetes.io/instance: es-kb-quickstart
+  annotations:
+    eck.k8s.elastic.co/license: basic
+spec:
+  version: 9.1.2
+  count: 1
+  elasticsearchRef:
+    name: elasticsearch
+  podTemplate:
+    spec:
+      containers:
+        - name: kibana
+          env:
+            - name: NODE_OPTIONS
+              value:  "--max-old-space-size=2048"
+            # - name: ELASTICSEARCH_HOSTS
+            #   value: "http://10.20.30.40:9200"
+            - name: SERVER_BASEPATH
+              value: "/kibana"
+            - name: SERVER_REWRITEBASEPATH
+              value: "true"
+            - name: SERVER_PUBLICBASEURL
+              value: "https://vanilla/kibana"

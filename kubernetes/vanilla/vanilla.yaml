@@ -52,7 +52,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: vanilla.cube.tanat44.com
+  - host: vanilla
     http:
       paths:
       - path: /
