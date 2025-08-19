@@ -4,5 +4,6 @@ namespace: my-elastic
 resources:
 - ./namespace.yaml
 - ./ingress.yaml
+- ./secret.yaml
 - ./elastic.yaml
 - ./kibana.yaml
