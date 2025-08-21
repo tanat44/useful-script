@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idle-sh-deployment
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: idle-sh
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: idle-sh
+    spec:
+      containers:
+      - name: idle-sh-container
+        image: curlimages/curl:latest
+        command: ["/bin/sh"]
+        args: ["/asset/sleep.sh"]
+        volumeMounts:
+        - name: asset-files
+          mountPath: /asset
+      volumes:
+      - name: asset-files
+        configMap:
+          name: asset-files
+          defaultMode: 0755
