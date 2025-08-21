@@ -1,0 +1,6 @@
+
+    configMapGenerator:
+    - name: node-files
+      files:
+      - index.js
+      - package.json

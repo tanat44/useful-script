@@ -1,0 +1,16 @@
+{
+  "name": "json-log",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@elastic/ecs-winston-format": "^1.5.3",
+    "winston": "^3.17.0",
+    "winston-format-debug": "^1.4.0"
+  }
+}
