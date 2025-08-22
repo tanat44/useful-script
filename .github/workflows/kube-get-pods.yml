@@ -1,0 +1,16 @@
+name: kube-get-pods
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.APMT_KUBE_CONFIG }}
+        with:
+          args: get pods
