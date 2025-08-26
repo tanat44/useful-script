@@ -23,10 +23,6 @@ sudo groupadd docker &>/dev/null
 
 sudo usermod -aG docker $USER &>/dev/null
 
-newgrp docker &>/dev/null
-
-docker run hello-world
-
 ### install minikube
 
 curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
