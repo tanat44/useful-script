@@ -52,12 +52,16 @@ rm -f ./cri-dockerd_0.4.0.3-0.debian-bookworm_amd64.deb
 CNI_PLUGIN_VERSION="v1.7.1"
 CNI_PLUGIN_TAR="cni-plugins-linux-amd64-$CNI_PLUGIN_VERSION.tgz" # change arch if not on amd64
 CNI_PLUGIN_INSTALL_DIR="/opt/cni/bin"
-
 curl -LO "https://github.com/containernetworking/plugins/releases/download/$CNI_PLUGIN_VERSION/$CNI_PLUGIN_TAR"
 sudo mkdir -p "$CNI_PLUGIN_INSTALL_DIR"
 sudo tar -xf "$CNI_PLUGIN_TAR" -C "$CNI_PLUGIN_INSTALL_DIR"
 rm "$CNI_PLUGIN_TAR"
 
 ### run minikube
-
 minikube start --driver=none
+
+### install brew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+### install k9s
+brew install derailed/k9s/k9s
