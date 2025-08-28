@@ -8,9 +8,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.APMT_KUBE_CONFIG }}
+name: dev-kube-deploy
+
+on:
+  pull_request: # trick to make this workflow show on website
+  workflow_dispatch:
+    inputs:
+      deploy_name:
+        description: 'Enter deployment name (e.g. bob)'
+        default: 'test'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
         with:
-          args: get pods --all-namespaces
+          version: 'latest' 
+      - name: Configure Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.APMT_KUBE_CONFIG }}" > ~/.kube/config
+      - run: |
+          kubectl get namespace
