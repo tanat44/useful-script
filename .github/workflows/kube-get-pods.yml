@@ -6,22 +6,6 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-
-    steps:
-name: dev-kube-deploy
-
-on:
-  pull_request: # trick to make this workflow show on website
-  workflow_dispatch:
-    inputs:
-      deploy_name:
-        description: 'Enter deployment name (e.g. bob)'
-        default: 'test'
-        required: true
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
     steps:
       - name: Setup kubectl
         uses: azure/setup-kubectl@v4
