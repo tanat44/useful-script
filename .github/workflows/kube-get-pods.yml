@@ -13,7 +13,7 @@ jobs:
         env:
           KUBECONFIG: ${{ secrets.TANUT_KUBE_CONFIG }}
         run: |
-          echo "${KUBECONFIG}" > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
+          mkdir -p ~/.kube
+          echo "${KUBECONFIG}" > ~/.kube/config
       - run: |
           kubectl get namespace
