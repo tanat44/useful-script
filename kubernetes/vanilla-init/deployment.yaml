@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vanilla-init-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vanilla-init-container
+  template:
+    metadata:
+      labels:
+        app: vanilla-init-container
+    spec:
+      containers:
+        - name: my-nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: "/usr/share/nginx/html"
+              name: vanilla-volume
+      volumes:
+        - name: vanilla-volume
+          persistentVolumeClaim:
+            claimName: vanilla-pvc
+        - name: scripts
+          configMap:
+            name: scripts
+            defaultMode: 0755
+      initContainers:
+        - name: init-myservice
+          image: busybox:1.28
+          command: ['sh', '-c', '/scripts/init.sh']
+          volumeMounts:
+            - mountPath: "/volume"
+              name: vanilla-volume
+            - mountPath: "/scripts"
+              name: scripts
+
