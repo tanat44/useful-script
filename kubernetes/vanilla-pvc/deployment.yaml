@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vanilla-namespace
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vanilla-deployment
+  namespace: vanilla-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vanilla-label
+  template:
+    metadata:
+      labels:
+        app: vanilla-label
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html/asset
+          name: vanilla-volume
+      volumes:
+      - name: vanilla-volume
+        persistentVolumeClaim:
+          claimName: vanilla-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: vanilla-service
+  namespace: vanilla-namespace
+spec:
+  selector:
+    app: vanilla-label
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vanilla-ingress
+  namespace: vanilla-namespace
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: vanilla
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vanilla-service
+            port:
+              number: 80
