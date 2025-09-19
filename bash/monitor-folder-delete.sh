@@ -2,9 +2,11 @@
 
 target_folder=~/test
 
-while inotifywait -e delete -r $target_folder; do
-  echo 1234
-  # if tail -n1 /var/log/messages | grep apache; then
-  #   kdialog --msgbox "Blah blah Apache"
-  # fi
+while inotifywait -q -e delete -r $target_folder; do
+  file_count=$(ls -1 $target_folder | wc -l)
+  if [ "$file_count" -eq "0" ]; then
+    echo "folder is empty"
+  else 
+    echo "$file_count files remain"
+  fi
 done
