@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vanilla-namespace
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vanilla-alpine
+  namespace: vanilla-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vanilla-alpine
+  template:
+    metadata:
+      labels:
+        app: vanilla-alpine
+    spec:
+      containers:
+      - name: alpine
+        image: alpine   # or ubuntu
+        command: [ '/bin/sh', '-c', 'tail -f /dev/null' ]
