@@ -52,10 +52,9 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: vanilla
-    http:
+  - http:
       paths:
-      - path: /
+      - path: /vanilla
         pathType: Prefix
         backend:
           service:
