@@ -1,7 +1,7 @@
 // Hardware
 // 1. ESP32S3
 // 2. AS5600  (pin7=sda, pin8=scl)
-// 3. L298N (pin9 & pin10)
+// 3. L298N (pin9, pin10)
 // Onboard RBG LED is at pin 21
 
 #include "AS5600.h"
