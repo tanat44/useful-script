@@ -3,8 +3,8 @@
 // constant
 const boolean reverseMotor1 = true;
 const boolean reverseMotor2 = false;
-const uint8_t maxPwm = 190;
-const uint8_t maxSteering = 50;
+const uint8_t maxPwm = 255;
+const uint8_t maxSteering = 80;
 
 // PIN SETTING
 const uint8_t motor1Pin1 = 27;
@@ -58,6 +58,8 @@ void onDisconnectedController(ControllerPtr ctl) {
 void dumpGamepad(ControllerPtr ctl) {
   int32_t steer = map(ctl->axisX(), -512, 512, -maxSteering, maxSteering);
   int32_t accel = map(-ctl->axisRY(), -512, 512, -255, 255);
+
+  if (accel < 0) return;
 
   int32_t pwmLeft = abs(accel);
   int32_t pwmRight = abs(accel);
