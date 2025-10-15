@@ -55,7 +55,7 @@ void onConnectionEstablished() {
   });
 
   // Subscribe to "mytopic/wildcardtest/#" and display received message to Serial
-  client.subscribe("mytopic/wildcardtest/#", [](const String &topic, const String &payload) {
+  client.subscribe("mytopic/wi ldcardtest/#", [](const String &topic, const String &payload) {
     Serial.println("(From wildcard) topic: " + topic + ", payload: " + payload);
   });
 
