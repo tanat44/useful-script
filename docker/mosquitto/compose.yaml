@@ -1,6 +1,7 @@
 volumes:
   mosquitto_data:
   mosquitto_log:
+  mqttui_data:
 
 services:
   mosquitto:
@@ -14,3 +15,29 @@ services:
       - ./passwd_file:/mosquitto/passwd_file
       - mosquitto_data:/mosquitto/data
       - mosquitto_log:/mosquitto/log
+
+  web:
+    image: terdia07/mqttui
+    ports:
+      - "8088:5000"
+    environment:
+      - DEBUG=False
+      - HOST=0.0.0.0
+      - PORT=5000
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_USERNAME=hello
+      - MQTT_PASSWORD=test
+      - MQTT_KEEPALIVE=60
+      - MQTT_VERSION=3.1.1
+      - SECRET_KEY=your-secret-key
+      - LOG_LEVEL=INFO
+      - MQTT_TOPICS=#
+      - DB_ENABLED=True
+      - DB_PATH=/app/data/mqtt_messages.db
+      - DB_MAX_MESSAGES=10000
+      - DB_CLEANUP_DAYS=30
+    volumes:
+      - mqttui_data:/app
+    depends_on:
+      - mosquitto
