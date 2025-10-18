@@ -1,9 +1,9 @@
 #include <Bluepad32.h>
 
 // constant
-const uint8_t maxSpeed = 120;
+const uint8_t maxSpeed = 255;
 const uint8_t maxSteerSpeed = 80;
-const uint8_t spotTurnSpeed = 100;
+const uint8_t spotTurnSpeed = 150;
 
 // PIN SETTING
 const uint8_t motorLPin1 = 25;   // swap pin1 and pin2 if motor is turning in the wrong direction
@@ -11,7 +11,11 @@ const uint8_t motorLPin2 = 27;
 const uint8_t motorRPin1 = 32;
 const uint8_t motorRPin2 = 12;
 
+// GLOBAL VAR
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];
+int32_t currentPwmL = 0;
+int32_t currentPwmR = 0;
+
 
 // This callback gets called any time a new gamepad is connected.
 // Up to 4 gamepads can be connected at the same time.
@@ -52,62 +56,27 @@ void onDisconnectedController(ControllerPtr ctl) {
   }
 }
 
-void spotTurn(ControllerPtr ctl, uint8_t* pwmL, uint8_t* pwmR) {
+void spotTurn(ControllerPtr ctl, int32_t* pwmL, int32_t* pwmR) {
   int32_t steer = map(ctl->axisX(), -512, 512, -spotTurnSpeed, spotTurnSpeed);
-  uint8_t pwm = abs(steer);
-  *pwmL = pwm;
-  *pwmR = pwm;
-
-  if (steer > 0) {
-    // left forward
-    analogWrite(motorLPin1, pwm);
-    analogWrite(motorLPin2, 0);
-    // right reverse
-    analogWrite(motorRPin1, 0);
-    analogWrite(motorRPin2, pwm);
-  } else {
-    // left reverse
-    analogWrite(motorLPin1, 0);
-    analogWrite(motorLPin2, pwm);
-    // right forward
-    analogWrite(motorRPin1, pwm);
-    analogWrite(motorRPin2, 0);
-  }
+  *pwmL = steer;
+  *pwmR = -steer;
 }
 
-void driveAndSteer(ControllerPtr ctl, uint8_t* pwmL, uint8_t* pwmR) {
+void driveAndSteer(ControllerPtr ctl, int32_t* pwmL, int32_t* pwmR) {
   int32_t steer = map(ctl->axisX(), -512, 512, -maxSteerSpeed, maxSteerSpeed);
-  int32_t accel = map(-ctl->axisRY(), -512, 512, -255, 255);
+  int32_t accel = map(-ctl->axisRY(), -512, 512, -maxSpeed, maxSpeed);
 
-  int32_t pwmLeft = abs(accel);
-  int32_t pwmRight = abs(accel);
+  int32_t pwmLeft = accel;
+  int32_t pwmRight = accel;
 
   if (steer > 0) {
-    // forward right
     pwmRight -= steer;
   } else {
-    // forward left
     pwmLeft += steer;
   }
 
-  *pwmL = map(pwmLeft, 0, 255, 0, maxSpeed);
-  *pwmR = map(pwmRight, 0, 255, 0, maxSpeed);
-
-  if (accel > 0) {
-    analogWrite(motorLPin1, *pwmL);
-    analogWrite(motorLPin2, 0);
-  } else {
-    analogWrite(motorLPin1, 0);
-    analogWrite(motorLPin2, *pwmL);
-  }
-
-  if (accel > 0) {
-    analogWrite(motorRPin1, *pwmR);
-    analogWrite(motorRPin2, 0);
-  } else {
-    analogWrite(motorRPin1, 0);
-    analogWrite(motorRPin2, *pwmR);
-  }
+  *pwmL = map(pwmLeft, -maxSpeed, maxSpeed, 0, maxSpeed);
+  *pwmR = map(pwmRight, -maxSpeed, maxSpeed, 0, maxSpeed);
 }
 
 
@@ -115,15 +84,35 @@ void dumpGamepad(ControllerPtr ctl) {
   int32_t steer = map(ctl->axisX(), -512, 512, -255, 255);
   int32_t accel = map(-ctl->axisRY(), -512, 512, -255, 255);
 
-  uint8_t pwmL = 0;
-  uint8_t pwmR = 0;
+  int32_t pwmL = 0;
+  int32_t pwmR = 0;
   if (accel == 0) {
     spotTurn(ctl, &pwmL, &pwmR);
   } else {
     driveAndSteer(ctl, &pwmL, &pwmR);
   }
 
-  Serial.printf("s=%d\ta=%d\t[L=%d, R=%d]\n", steer, accel, pwmL, pwmR);
+  int32_t count = 10;
+  currentPwmL = (currentPwmL*count + pwmL)/(count+1);
+  currentPwmR = (currentPwmR*count + pwmR)/(count+1);
+
+  if (currentPwmL > 0) {
+    analogWrite(motorLPin1, abs(currentPwmL));
+    analogWrite(motorLPin2, 1);
+  } else {
+    analogWrite(motorLPin1, 1);
+    analogWrite(motorLPin2, abs(currentPwmL));
+  }
+
+  if (currentPwmR > 0) {
+    analogWrite(motorRPin1, abs(currentPwmR));
+    analogWrite(motorRPin2, 1);
+  } else {
+    analogWrite(motorRPin1, 1);
+    analogWrite(motorRPin2, abs(currentPwmR));
+  }
+
+  Serial.printf("s=%d\ta=%d\t[L=%d, R=%d]\n", steer, accel, currentPwmL, currentPwmR);
   return;
 
   Serial.printf(
