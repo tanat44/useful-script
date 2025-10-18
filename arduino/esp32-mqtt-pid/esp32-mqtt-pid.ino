@@ -44,10 +44,10 @@ const int freq = 5000;
 const int resolution = 8;
 const int motorPin1 = 9;
 const int motorPin2 = 10;
-MotorMode motorMode = MotorMode::PWM;
+MotorMode motorMode = MotorMode::POS;
 int16_t motorCommand = 0;
 float kp = 0.1f;
-float kd = 0.0f;
+float kd = -100.0f;
 float ki = 0.0f;
 int16_t lastPwm = 0;
 int16_t lastDelta = 0;
@@ -86,10 +86,20 @@ void setMotorPwm(int16_t pwm) {
     return;
 
   // rescale pwm from MIN to 255
-  uint8_t command = map(abs(pwm), 0, 255, 170, 255);
+  if (pwm > 255) {
+    pwm = 255;
+  }
+  if (pwm < -255) {
+    pwm = -255;
+  }
+  uint8_t command = map(abs(pwm), 0, 255, 180, 255);
 
-  sendInfo("Update pwm: " + String(pwm));
-  if (pwm > 0) {
+
+  // sendInfo("Update pwm: " + String(pwm));
+  if (pwm == 0) {
+    ledcWrite(motorPin1, 0);
+    ledcWrite(motorPin2, 0);
+  } else if (pwm > 0) {
     ledcWrite(motorPin1, command);
     ledcWrite(motorPin2, 0);
   } else {
@@ -103,7 +113,7 @@ void setMotorPos(int16_t position) {
   int32_t d = position - encoder1Raw;
   int32_t d2 = d - lastDelta;
   error += d;
-  setMotorPwm(kp * (float)d + kd * (float) d2 + ki * error);
+  setMotorPwm(kp * (float)d + kd * (float)d2 + ki * error);
   lastDelta = d;
 }
 
@@ -122,12 +132,14 @@ void onConnectionEstablished() {
   String pwmTopic = String(nodeName) + "/motor/1/#";
   client.subscribe(pwmTopic, [](const String &topic, const String &payload) {
     int16_t value = payload.toInt();
-    if (value < -255 || value > 255) {
-      sendError(topic + ": input out of range");
-      return;
-    }
+
     Serial.printf("%s: %d\n", topic.c_str(), value);
     if (topic.indexOf("pwm") > -1) {
+
+      if (value < -255 || value > 255) {
+        sendError(topic + ": input out of range");
+        return;
+      }
       motorMode = MotorMode::PWM;
       motorCommand = value;
 
@@ -207,7 +219,4 @@ void loop() {
   strcat(topic, "/encoder/1");
   String out = String(value) + "\t" + String(vel) + "\t" + String(acc);
   client.publish(topic, out);
-
-
-
 }
