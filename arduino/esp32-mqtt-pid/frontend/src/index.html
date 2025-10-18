@@ -1,3 +1,26 @@
-<body style="margin: 0; padding: 0">
-  <h1>welcome!</h1>
+<body style="margin: 0; padding: 1rem">
+  <h1>mqtt pid control panel</h1>
+  <div class="column">
+  <div class="row">
+        <div class="column border" style="flex: 1">
+      <div class="center bold">control</div>
+      <div id="pwmOption" class="row">pwm</div>
+      <div id="positionOption" class="row">position</div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="column border" style="flex: 1">
+      <div class="center bold">encoder</div>
+      <div id="encoderContent" class="column-reverse"></div>
+    </div>
+    <div class="column border" style="flex: 1">
+      <div class="center bold">info</div>
+      <div id="infoContent" class="column-reverse"></div>
+    </div>
+    <div class="column border" style="flex: 1">
+      <div class="center bold">error</div>
+      <div id="errorContent" class="column-reverse"></div>
+    </div>
+  </div>
+  </div>
 </body>

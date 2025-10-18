@@ -82,18 +82,17 @@ void sendError(const String &message) {
 }
 
 void setMotorPwm(int16_t pwm) {
-  if (lastPwm == pwm)
-    return;
-
-  // rescale pwm from MIN to 255
   if (pwm > 255) {
     pwm = 255;
   }
   if (pwm < -255) {
     pwm = -255;
   }
-  uint8_t command = map(abs(pwm), 0, 255, 180, 255);
+  if (lastPwm == pwm)
+    return;
 
+  // rescale pwm from MIN to 255
+  uint8_t command = map(abs(pwm), 0, 255, 180, 255);
 
   sendInfo("Update pwm: " + String(pwm) + ", command: " + String(command));
   if (pwm == 0) {
@@ -169,7 +168,7 @@ void onConnectionEstablished() {
     Serial.println("(From wildcard) topic: " + topic + ", payload: " + payload);
   });
 
-  client.publish("node/join", nodeName);
+  client.publish("node/hi", nodeName);
 
   // Execute delayed instructions
   client.executeDelayed(5 * 1000, []() {

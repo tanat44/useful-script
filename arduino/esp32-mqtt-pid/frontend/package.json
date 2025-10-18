@@ -18,6 +18,8 @@
     "webpack-dev-server": "^4.13.1"
   },
   "dependencies": {
-    "html-webpack-plugin": "^5.5.0"
+    "chart.js": "^4.5.1",
+    "html-webpack-plugin": "^5.5.0",
+    "mqtt": "^5.14.1"
   }
 }

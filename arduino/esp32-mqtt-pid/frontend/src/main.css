@@ -6,7 +6,13 @@ button {
   border: none;
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 5px;
-  background-color: transparent;
+  background-color: #9dfcc3a3 ;
+}
+
+.border {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  padding: 1rem;
 }
 
 #controlPanel {
@@ -70,6 +76,12 @@ button {
   gap: 5px
 }
 
+.column-reverse{
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 5px
+}
+
 .flexWrap {
   flex-wrap: wrap;
 }
@@ -101,6 +113,10 @@ button {
 .workingStatus{
   animation: blinker 2s ease-in-out infinite;
   background-color: lightgreen;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 @keyframes blinker {
