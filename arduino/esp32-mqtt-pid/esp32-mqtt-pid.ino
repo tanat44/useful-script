@@ -95,7 +95,7 @@ void setMotorPwm(int16_t pwm) {
   uint8_t command = map(abs(pwm), 0, 255, 180, 255);
 
 
-  // sendInfo("Update pwm: " + String(pwm));
+  sendInfo("Update pwm: " + String(pwm) + ", command: " + String(command));
   if (pwm == 0) {
     ledcWrite(motorPin1, 0);
     ledcWrite(motorPin2, 0);
@@ -132,17 +132,14 @@ void onConnectionEstablished() {
   String pwmTopic = String(nodeName) + "/motor/1/#";
   client.subscribe(pwmTopic, [](const String &topic, const String &payload) {
     int16_t value = payload.toInt();
-
-    Serial.printf("%s: %d\n", topic.c_str(), value);
+    sendInfo("received: " + topic + " >> " + String(value));
     if (topic.indexOf("pwm") > -1) {
-
       if (value < -255 || value > 255) {
         sendError(topic + ": input out of range");
         return;
       }
       motorMode = MotorMode::PWM;
       motorCommand = value;
-
     } else if (topic.indexOf("pos") > -1) {
       motorMode = MotorMode::POS;
       if (topic.indexOf("kp") > -1) {

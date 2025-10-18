@@ -92,9 +92,8 @@ void dumpGamepad(ControllerPtr ctl) {
     driveAndSteer(ctl, &pwmL, &pwmR);
   }
 
-  int32_t count = 10;
-  currentPwmL = (currentPwmL*count + pwmL)/(count+1);
-  currentPwmR = (currentPwmR*count + pwmR)/(count+1);
+  currentPwmL = pwmL;
+  currentPwmR = pwmR;
 
   if (currentPwmL > 0) {
     analogWrite(motorLPin1, abs(currentPwmL));
