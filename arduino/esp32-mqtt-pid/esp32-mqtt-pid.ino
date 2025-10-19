@@ -128,8 +128,8 @@ void setMotorVel(int16_t vel) {
 void onConnectionEstablished() {
 
   // motor control
-  String pwmTopic = String(nodeName) + "/motor/1/#";
-  client.subscribe(pwmTopic, [](const String &topic, const String &payload) {
+  String motorTopic = String(nodeName) + "/motor/1/#";
+  client.subscribe(motorTopic, [](const String &topic, const String &payload) {
     int16_t value = payload.toInt();
     sendInfo("received: " + topic + " >> " + String(value));
     if (topic.indexOf("pwm") > -1) {
@@ -147,16 +147,16 @@ void onConnectionEstablished() {
         ki = payload.toFloat();
       } else if (topic.indexOf("kd") > -1) {
         kd = payload.toFloat();
-      } else {
+      } else if (topic.indexOf("pid/req") > -1) {
+        String response = String(kp) + "\t" + String(ki) + "\t" + String(kd);
+        client.publish(String(nodeName) + "/motor/1/pos/pid", response);
+      } else if (topic.endsWith("pos")) {
         // set target position
         motorCommand = value;
       }
-      sendInfo("p=" + String(kp) + ", i=" + String(ki) + ", d=" + String(kd));
-
     } else if (topic.indexOf("vel") > -1) {
       motorMode = MotorMode::VEL;
       motorCommand = value;
-
     } else {
       sendError(topic + ": not supported");
       return;
