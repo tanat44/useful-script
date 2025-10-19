@@ -56,7 +56,7 @@ export const waitForStable = (maxWaitMs: number) => {
 
       const delta = Math.abs(newValue - target);
 
-      if (newValue === lastValue && delta < 200) {
+      if (newValue === lastValue && delta < 400) {
         document.removeEventListener(EVENT_ENCODER_DATA, onEncoderData);
         clearTimeout(timeout);
         resolve({
