@@ -1,4 +1,5 @@
 import { mqttClient } from "../mqtt";
+import { updateSetPos } from "../oscillation";
 import { TOPIC_MOTOR_POS, TOPIC_MOTOR_POS_PID_REQ } from "../topic";
 
 const positionDom = document.getElementById("positionOption");
@@ -8,7 +9,9 @@ for (const value of positionValue) {
   button.innerText = value.toString();
   positionDom.appendChild(button);
   button.onclick = () => {
-    mqttClient.publish(TOPIC_MOTOR_POS, (value * 4096).toString());
+    const rawValue = value * 4096;
+    updateSetPos(rawValue);
+    mqttClient.publish(TOPIC_MOTOR_POS, rawValue.toString());
   };
 }
 const positionPidRefresh = document.getElementById("positionPidRefresh");

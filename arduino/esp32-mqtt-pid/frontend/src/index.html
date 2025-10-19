@@ -3,7 +3,7 @@
   <div class="column">
     <div class="row">
       <div class="column border" style="flex: 1">
-        <div class="row" style="justify-content: center;">
+        <div class="row" style="justify-content: center">
           <div class="center bold">control</div>
           <button id="motorStop" style="background-color: tomato">stop</button>
         </div>
@@ -22,7 +22,11 @@
     </div>
     <div class="row">
       <div class="column border" style="flex: 1">
-        <div class="center bold">encoder</div>
+        <div class="row" style="justify-content: center">
+          <div class="bold">encoder</div>
+          <button id="encoderChartPause">pause</button>
+        </div>
+        <div style="width: 500px"><canvas id="encoderPlot"></canvas></div>
         <div id="encoderContent" class="column-reverse"></div>
       </div>
       <div class="column border" style="flex: 1">
@@ -33,6 +37,23 @@
         <div class="center bold">error</div>
         <div id="errorContent" class="column-reverse"></div>
       </div>
+    </div>
+    <div class="row">
+    <div class="column border" style="flex: 1">
+      <div class="bold">analysis</div>
+      <div class="row">
+        <div class="bold">oscillation count</div>
+        <div id="oscillationCount">0</div>
+      </div>
+    </div>
+        <div class="column border" style="flex: 1">
+      <div class="row">
+      <div class="bold">auto tune</div>
+
+        <button id="autoTuneKp">kp tune</button>
+        <div id="autoTuneResult"></div>
+      </div>
+    </div>
     </div>
   </div>
 </body>

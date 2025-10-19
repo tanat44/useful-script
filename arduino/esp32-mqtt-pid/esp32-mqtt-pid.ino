@@ -140,7 +140,6 @@ void onConnectionEstablished() {
       motorMode = MotorMode::PWM;
       motorCommand = value;
     } else if (topic.indexOf("pos") > -1) {
-      motorMode = MotorMode::POS;
       if (topic.indexOf("kp") > -1) {
         kp = payload.toFloat();
       } else if (topic.indexOf("ki") > -1) {
@@ -152,6 +151,7 @@ void onConnectionEstablished() {
         client.publish(String(nodeName) + "/motor/1/pos/pid", response);
       } else if (topic.endsWith("pos")) {
         // set target position
+        motorMode = MotorMode::POS;
         motorCommand = value;
       }
     } else if (topic.indexOf("vel") > -1) {

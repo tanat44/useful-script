@@ -1,4 +1,5 @@
 import mqtt from "mqtt";
+import { updateEncoderData } from "./encoder";
 import { updatePosPid } from "./motor/position";
 import {
   TOPICS,
@@ -20,7 +21,7 @@ mqttClient.on("connect", async () => {
 
   // publish on connect
   await mqttClient.publish("node/hi", "Hello from PID frontend");
-  await mqttClient.publish(TOPIC_MOTOR_POS_PID_REQ, "");
+  mqttClient.publish(TOPIC_MOTOR_POS_PID_REQ, "");
 });
 
 function addContent(parentId: string, content: string) {
@@ -42,7 +43,8 @@ mqttClient.on("message", (topic: string, message: Buffer) => {
   } else if (topic === TOPIC_ERROR) {
     addContent("errorContent", content);
   } else if (topic === TOPIC_ENCODER) {
-    addContent("encoderContent", content);
+    // addContent("encoderContent", content);
+    updateEncoderData(content);
   } else if (topic === TOPIC_MOTOR_POS_PID) {
     updatePosPid(content);
   }
