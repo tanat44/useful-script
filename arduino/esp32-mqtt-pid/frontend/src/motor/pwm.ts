@@ -17,6 +17,9 @@ const motorStop = document.getElementById("motorStop");
 motorStop.onclick = () => {
   mqttClient.publish(TOPIC_MOTOR_PWM, "0");
 };
-function updatePosPid(content: string) {
-  throw new Error("Function not implemented.");
-}
+
+document.onkeydown = (e: KeyboardEvent) => {
+  if (e.key === "Escape") {
+    mqttClient.publish(TOPIC_MOTOR_PWM, "0");
+  }
+};

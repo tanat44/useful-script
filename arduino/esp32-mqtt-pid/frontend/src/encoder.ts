@@ -1,5 +1,5 @@
 import { Chart } from "chart.js/auto";
-import { updateRawPosition } from "./oscillation";
+import { EVENT_ENCODER_DATA, EVENT_ENCODER_RAW } from "./event";
 
 export type EncoderData = {
   time: number;
@@ -7,6 +7,10 @@ export type EncoderData = {
   vel: number;
   acc: number;
 };
+
+document.addEventListener(EVENT_ENCODER_RAW, (e: CustomEvent) => {
+  updateEncoderData(e.detail);
+});
 
 export const updateEncoderData = (text: string) => {
   const elements = text.split("\t");
@@ -18,7 +22,9 @@ export const updateEncoderData = (text: string) => {
     acc: parseInt(elements[2]),
   };
 
-  updateRawPosition(raw);
+  document.dispatchEvent(
+    new CustomEvent(EVENT_ENCODER_DATA, { detail: thisData })
+  );
   if (running) updateChart(thisData);
 };
 

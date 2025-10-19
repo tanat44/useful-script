@@ -111,11 +111,11 @@ input {
 .waitingStatus{
   background-color:sandybrown;
 }
-.blockingStatus {
+.fail {
+  animation: blinker 2s ease-in-out infinite;
   background-color:tomato;
 }
-.workingStatus{
-  animation: blinker 2s ease-in-out infinite;
+.success{
   background-color: lightgreen;
 }
 

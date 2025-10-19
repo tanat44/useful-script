@@ -1,13 +1,12 @@
 import mqtt from "mqtt";
-import { updateEncoderData } from "./encoder";
-import { updatePosPid } from "./motor/position";
+import { EVENT_ENCODER_RAW } from "./event";
+import { requestPid, updatePosPid } from "./motor/positionpid";
 import {
   TOPICS,
   TOPIC_ENCODER,
   TOPIC_ERROR,
   TOPIC_INFO,
   TOPIC_MOTOR_POS_PID,
-  TOPIC_MOTOR_POS_PID_REQ,
 } from "./topic";
 
 export const mqttClient = mqtt.connect("mqtt://192.168.178.53:9001", {
@@ -21,7 +20,7 @@ mqttClient.on("connect", async () => {
 
   // publish on connect
   await mqttClient.publish("node/hi", "Hello from PID frontend");
-  mqttClient.publish(TOPIC_MOTOR_POS_PID_REQ, "");
+  await requestPid();
 });
 
 function addContent(parentId: string, content: string) {
@@ -43,8 +42,9 @@ mqttClient.on("message", (topic: string, message: Buffer) => {
   } else if (topic === TOPIC_ERROR) {
     addContent("errorContent", content);
   } else if (topic === TOPIC_ENCODER) {
-    // addContent("encoderContent", content);
-    updateEncoderData(content);
+    document.dispatchEvent(
+      new CustomEvent(EVENT_ENCODER_RAW, { detail: content })
+    );
   } else if (topic === TOPIC_MOTOR_POS_PID) {
     updatePosPid(content);
   }
