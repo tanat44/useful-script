@@ -20,10 +20,13 @@
 
 - name: install kubeconfig
   shell: |
+    export KUBECONFIG=/home/tanut/.kube/config
+    sudo k3s kubectl config view --raw > "$KUBECONFIG"
+    chmod 777 "$KUBECONFIG"
+  become: true
+
+- name: add kubeconfig to bashrc
+  shell: |
     export KUBECONFIG=~/.kube/config
     mkdir ~/.kube 2> /dev/null
-    sudo k3s kubectl config view --raw > "$KUBECONFIG"
-    chmod 600 "$KUBECONFIG"
-
     echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc
-  become: true
