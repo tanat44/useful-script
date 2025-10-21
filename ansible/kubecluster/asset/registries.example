@@ -1,0 +1,10 @@
+mirrors:
+  "hello.com":
+    endpoint:
+      - "https://hello.com"
+
+configs:
+  "hello.com":
+    auth:
+      username: myusername
+      password: mypassword
