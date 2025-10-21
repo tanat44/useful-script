@@ -1,0 +1,16 @@
+- name: install brew
+  shell: |
+    export NONINTERACTIVE=1
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    echo >> /home/tanut/.bashrc
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/tanut/.bashrc
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+- name: install gcc
+  shell: |
+    sudo apt update && sudo apt install -y gcc
+  become: true
+
+- name: install k9s
+  shell: |
+    /home/linuxbrew/.linuxbrew/bin/brew install derailed/k9s/k9s

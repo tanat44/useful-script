@@ -1,0 +1,14 @@
+- name: install k3s control plane
+  hosts: tanut1
+  tasks:
+
+    - import_tasks: ../task/install-k9s.yaml
+
+    - import_tasks: ../task/install-k3s-pre.yaml
+
+    - name: install control plane
+      shell: |
+        INSTALL_K3S_SKIP_DOWNLOAD=true K3S_TOKEN="{{ controlplane_token }}" ./install.sh
+      become: true
+
+    - import_tasks: ../task/install-k3s-post.yaml

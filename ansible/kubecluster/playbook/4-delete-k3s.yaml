@@ -1,0 +1,20 @@
+- name: delete k3s
+  hosts: myhosts
+  tasks:
+
+    - name: delete config
+      shell: 
+        rm -rf .kube
+
+    - name: delete k3s control plane
+      shell: |
+        /usr/local/bin/k3s-uninstall.sh
+      become: true
+      ignore_errors: yes
+      
+    - name: delete k3s agent
+      shell: |
+        /usr/local/bin/k3s-agent-uninstall.sh
+      become: true
+      ignore_errors: yes
+      

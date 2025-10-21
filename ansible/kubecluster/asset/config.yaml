@@ -1,0 +1,5 @@
+write-kubeconfig-mode: "0644"
+disable: 
+  - traefik
+kubelet-arg: "config=/etc/rancher/k3s/kubelet.config"
+disable-network-policy: true
