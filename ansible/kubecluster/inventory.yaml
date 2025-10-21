@@ -4,9 +4,12 @@ myhosts:
       ansible_host: 46.224.9.4
     tanut2:
       ansible_host: 46.224.13.233
-    tanut3:
-      ansible_host: 46.224.9.5
-
+    # tanut3:
+    #   ansible_host: 46.224.9.5
+    # tanut4:
+    #   ansible_host: 91.98.93.35
+    # tanut5:
+    #   ansible_host: 46.224.9.3
 all:
   vars:
     ansible_user: tanut

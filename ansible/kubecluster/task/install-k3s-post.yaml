@@ -1,0 +1,29 @@
+
+- name: stop k3s
+  shell: |
+    sudo systemctl stop k3s
+  become: true
+
+- copy:
+    src: "{{ item }}"
+    dest: /etc/rancher/k3s/
+    owner: root
+    mode: 644
+  become: true
+  with_fileglob:
+    - "../asset/*"
+
+- name: start k3s
+  shell: |
+    sudo systemctl start k3s
+  become: true
+
+- name: install kubeconfig
+  shell: |
+    export KUBECONFIG=~/.kube/config
+    mkdir ~/.kube 2> /dev/null
+    sudo k3s kubectl config view --raw > "$KUBECONFIG"
+    chmod 600 "$KUBECONFIG"
+
+    echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc
+  become: true
