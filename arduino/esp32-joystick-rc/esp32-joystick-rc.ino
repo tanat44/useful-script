@@ -97,17 +97,17 @@ void dumpGamepad(ControllerPtr ctl) {
 
   if (currentPwmL > 0) {
     analogWrite(motorLPin1, abs(currentPwmL));
-    analogWrite(motorLPin2, 1);
+    analogWrite(motorLPin2, 0);
   } else {
-    analogWrite(motorLPin1, 1);
+    analogWrite(motorLPin1, 0);
     analogWrite(motorLPin2, abs(currentPwmL));
   }
 
   if (currentPwmR > 0) {
     analogWrite(motorRPin1, abs(currentPwmR));
-    analogWrite(motorRPin2, 1);
+    analogWrite(motorRPin2, 0);
   } else {
-    analogWrite(motorRPin1, 1);
+    analogWrite(motorRPin1, 0);
     analogWrite(motorRPin2, abs(currentPwmR));
   }
 
