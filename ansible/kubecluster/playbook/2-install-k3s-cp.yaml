@@ -60,3 +60,15 @@
     - name: install nginx
       shell: |
         kubectl apply -f nginx.yaml
+
+    - name: prepare temp kubeconfig
+      shell: |
+        cp .kube/config ansiblekube.config
+        sed -i 's/127.0.0.1/{{ controlplane_ip }}/g' ansiblekube.config
+        sed -i 's/default/ansiblekube/g' ansiblekube.config
+    
+    - name: copy ansiblekube.config to local
+      ansible.builtin.fetch:
+        src: ansiblekube.config
+        dest: ~/.kube/
+        flat: true
