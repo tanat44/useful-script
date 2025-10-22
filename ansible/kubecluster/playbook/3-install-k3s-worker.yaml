@@ -1,16 +1,40 @@
-- name: install k3s node
+- name: install k3s worker
   hosts: 
     - tanut2
     - tanut3
+    - tanut4
+    - tanut5
 
   tasks:
-    - import_tasks: ../task/install-k9s.yaml
+    - import_tasks: ../task/install-k3s-download.yaml
 
-    - import_tasks: ../task/install-k3s-pre.yaml
-
-    - name: install control plane
+    - name: install k3s agent
       shell: |
         INSTALL_K3S_SKIP_DOWNLOAD=true K3S_URL=https://{{ controlplane_ip }}:6443 K3S_TOKEN={{ controlplane_token }} ./install.sh
       become: true
 
-    - import_tasks: ../task/install-k3s-post.yaml
+    - name: stop k3s agent
+      shell: |
+        sudo systemctl stop k3s-agent
+      become: true
+
+    - copy:
+        src: "{{ item.src }}"
+        dest: /etc/rancher/k3s/
+        owner: root
+        mode: 644
+      become: true
+      loop:
+        - src: ../asset/registries.yaml
+
+    - name: start k3s agent
+      shell: |
+        sudo systemctl start k3s-agent
+      become: true
+
+    - name: Wait for k3s agent to be running
+      service_facts:
+      register: result
+      until: result.ansible_facts.services['k3s-agent.service'].state == 'running'
+      retries: 10
+      delay: 5

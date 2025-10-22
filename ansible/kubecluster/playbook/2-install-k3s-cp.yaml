@@ -4,11 +4,59 @@
 
     - import_tasks: ../task/install-k9s.yaml
 
-    - import_tasks: ../task/install-k3s-pre.yaml
+    - import_tasks: ../task/install-k3s-download.yaml
 
     - name: install control plane
       shell: |
         INSTALL_K3S_SKIP_DOWNLOAD=true K3S_TOKEN="{{ controlplane_token }}" ./install.sh
       become: true
 
-    - import_tasks: ../task/install-k3s-post.yaml
+    - name: stop k3s
+      shell: |
+        sudo systemctl stop k3s
+      become: true
+
+    - copy:
+        src: "{{ item.src }}"
+        dest: /etc/rancher/k3s/
+        owner: root
+        mode: 644
+      become: true
+      loop:
+        - src: ../asset/config.yaml
+        - src: ../asset/kubelet.config
+        - src: ../asset/registries.yaml
+
+    - name: start k3s
+      shell: |
+        sudo systemctl start k3s
+      become: true
+
+    - name: Wait for k3s to be running
+      service_facts:
+      register: result
+      until: result.ansible_facts.services['k3s.service'].state == 'running'
+      retries: 10
+      delay: 5
+
+    - name: install kubeconfig
+      shell: |
+        export KUBECONFIG=/home/tanut/.kube/config
+        sudo k3s kubectl config view --raw > "$KUBECONFIG"
+        chmod 777 "$KUBECONFIG"
+      become: true
+
+    - name: add kubeconfig to bashrc
+      shell: |
+        export KUBECONFIG=~/.kube/config
+        mkdir ~/.kube 2> /dev/null
+        echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc
+
+    - name: copy nginx manifest
+      copy:
+        src: ../asset/nginx.yaml
+        dest: "~"
+
+    - name: install nginx
+      shell: |
+        kubectl apply -f nginx.yaml
