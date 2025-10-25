@@ -1,32 +1,45 @@
-const uint8_t motorLPin1 = 3; 
-const uint8_t motorLPin2 = 4;
-const uint8_t motorRPin1 = 5;
-const uint8_t motorRPin2 = 6;
+const int freq = 5000;
+const int resolution = 8;
 
-int count = 0;
+// PIN SETTING
+const int motor1Pin2 = 27;
+const int motor1Pin1 = 25;
+const int motor2Pin1 = 32;
+const int motor2Pin2 = 12;
+const int pwmValue = 180;
+int value = 0;
 
 void setup() {
   Serial.begin(115200);
   Serial.println("hello");
-  ledcAttach(motorLPin1, 5000, 8);
-  ledcAttach(motorLPin2, 5000, 8);
-  ledcAttach(motorRPin1, 5000, 8);
-  ledcAttach(motorRPin2, 5000, 8);
+
+  ledcAttach(motor1Pin1, freq, resolution);
+  ledcAttach(motor1Pin2, freq, resolution);
+  ledcAttach(motor2Pin1, freq, resolution);
+  ledcAttach(motor2Pin2, freq, resolution);
 }
 
+
 void loop() {
-  if (count % 2 == 0) {
-    ledcWrite(motorLPin1, 255);
-    ledcWrite(motorLPin2, 0);
-    ledcWrite(motorRPin1, 255);
-    ledcWrite(motorRPin2, 0);
+  static uint32_t lastTime = 0;
+  if (millis() - lastTime < 2000) return;
+  lastTime = millis();
+
+  // print output
+  Serial.println(value);
+
+  // control motor
+  if (value % 2 == 0) {
+    ledcWrite(motor1Pin1, pwmValue);
+    ledcWrite(motor1Pin2, 0);
+    ledcWrite(motor2Pin1, pwmValue);
+    ledcWrite(motor2Pin2, 0);
   } else {
-    ledcWrite(motorLPin1, 0);
-    ledcWrite(motorLPin2, 255);
-    ledcWrite(motorRPin1, 0);
-    ledcWrite(motorRPin2, 255);
+    ledcWrite(motor1Pin1, 0);
+    ledcWrite(motor1Pin2, pwmValue);
+    ledcWrite(motor2Pin1, 0);
+    ledcWrite(motor2Pin2, pwmValue);
   }
 
-  Serial.println("hello " + String(count++));
-  sleep(1);
+  ++value;
 }

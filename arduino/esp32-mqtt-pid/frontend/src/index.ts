@@ -4,6 +4,7 @@ import "./motor/autotune";
 import { testOscillation } from "./motor/autotune";
 import "./motor/position";
 import "./motor/pwm";
+import "./motor/pwmanalysis";
 import "./mqtt";
 
 document.getElementById("testOscillation").onclick = testOscillation;

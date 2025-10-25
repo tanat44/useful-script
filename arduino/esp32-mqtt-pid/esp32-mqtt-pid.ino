@@ -12,7 +12,7 @@
 uint32_t deltaTime = 0;
 enum MotorMode { PWM,
                  POS,
-                 VEL };
+                 COM }; // complicance control (stiffness control)
 uint32_t midLoopTime;
 uint32_t slowLoopTime;
 
@@ -31,6 +31,7 @@ EspMQTTClient client(
   serverPass,
   nodeName,
   1883);
+const uint8_t ledPin = 21;
 
 // sensor1
 AS5600 encoder1;
@@ -42,16 +43,20 @@ int32_t encoder1Vel = 0;
 // motor
 const int freq = 5000;
 const int resolution = 8;
-const int motorPin1 = 9;
-const int motorPin2 = 10;
+const int motorPin1 = 10;
+const int motorPin2 = 9;
 MotorMode motorMode = MotorMode::POS;
 int16_t motorCommand = 0;
-float kp = 0.1f;
-float kd = -100.0f;
+float kp = 0.08f;   // history kp 0.1, kd -100
+float kd = 2000.0f;
 float ki = 0.0f;
+float stiffness = 0.01f;
+uint8_t minPwm = 140;
+const uint8_t frictionOvercomePwm = 170;
 int16_t lastPwm = 0;
 int16_t lastDelta = 0;
 int16_t error = 0;
+int16_t motorPosition = 0;
 
 void setup() {
   Serial.println("started");
@@ -71,6 +76,8 @@ void setup() {
   client.enableHTTPWebUpdater();                       // Enable the web updater. User and password default to values of MQTTUsername and MQTTPassword. These can be overridded with enableHTTPWebUpdater("user", "password").
   client.enableOTA();                                  // Enable OTA (Over The Air) updates. Password defaults to MQTTPassword. Port is the default OTA port. Can be overridden with enableOTA("password", port).
   client.enableLastWillMessage("node/bye", nodeName);  // You can activate the retain flag by setting the third parameter to true
+
+  rgbLedWrite(ledPin, 255, 0, 0);   // red light when disconnect
 }
 
 void sendInfo(const String &message) {
@@ -91,8 +98,19 @@ void setMotorPwm(int16_t pwm) {
   if (lastPwm == pwm)
     return;
 
+  // friction compensation (introduce pwm spike) when start from v = 0 && there's pwm command
+  if (pwm != 0) {
+    if (abs(encoder1Vel) < 10) {
+      if (pwm > 0) {
+        pwm = frictionOvercomePwm;
+      } else {
+        pwm = -frictionOvercomePwm;
+      }
+    }
+  }
+
   // rescale pwm from MIN to 255
-  uint8_t command = map(abs(pwm), 0, 255, 180, 255);
+  uint8_t command = map(abs(pwm), 0, 255, minPwm, 255);
 
   sendInfo("Update pwm: " + String(pwm) + ", command: " + String(command));
   if (pwm == 0) {
@@ -124,6 +142,14 @@ void setMotorVel(int16_t vel) {
     setMotorPwm(-255);
 }
 
+void setMotorCompliance() {
+  int16_t d = abs( (int16_t) encoder1Raw - motorPosition);
+  kp = (double) d * (double) stiffness / 1000.0d;
+  kd = 0.0f;
+  setMotorPos(motorPosition);
+  sendInfo("complicance new kp = " + String(kp));
+}
+
 // This function is called once everything is connected (Wifi and MQTT)
 void onConnectionEstablished() {
 
@@ -133,6 +159,10 @@ void onConnectionEstablished() {
     int16_t value = payload.toInt();
     sendInfo("received: " + topic + " >> " + String(value));
     if (topic.indexOf("pwm") > -1) {
+      if (topic.indexOf("min") > -1) {
+        minPwm = payload.toInt();
+        return;
+      }
       if (value < -255 || value > 255) {
         sendError(topic + ": input out of range");
         return;
@@ -154,26 +184,23 @@ void onConnectionEstablished() {
         motorMode = MotorMode::POS;
         motorCommand = value;
       }
-    } else if (topic.indexOf("vel") > -1) {
-      motorMode = MotorMode::VEL;
-      motorCommand = value;
+    } else if (topic.indexOf("com") > -1) {
+      if (topic.indexOf("stiffness") > -1) {
+        stiffness = payload.toFloat();
+      } else if (topic.endsWith("com")) {
+        motorMode = MotorMode::COM;
+        motorCommand = value;
+        motorPosition = encoder1Raw;
+      }
     } else {
       sendError(topic + ": not supported");
       return;
     }
   });
 
-  // Subscribe to "mytopic/wildcardtest/#" and display received message to Serial
-  client.subscribe("mytopic/#", [](const String &topic, const String &payload) {
-    Serial.println("(From wildcard) topic: " + topic + ", payload: " + payload);
-  });
-
   client.publish("node/hi", nodeName);
 
-  // Execute delayed instructions
-  client.executeDelayed(5 * 1000, []() {
-    client.publish("mytopic/wildcardtest/test123", "This is a message sent 5 seconds later");
-  });
+  rgbLedWrite(ledPin, 0, 255, 0);   // red light on connect
 }
 
 void loop() {
@@ -187,6 +214,8 @@ void loop() {
     setMotorPwm(motorCommand);
   } else if (motorMode == MotorMode::POS) {
     setMotorPos(motorCommand);
+  } else if (motorMode == MotorMode::COM) {
+    setMotorCompliance();
   } else {
     sendError("MotorMode not supported");
     setMotorPwm(0);

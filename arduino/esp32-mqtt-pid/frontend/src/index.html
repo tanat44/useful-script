@@ -45,12 +45,24 @@
           <div class="bold">oscillation count</div>
           <div id="oscillationCount">0</div>
         </div>
+        <div id="pwmAnalysis" class="column">
+          <div class="row">
+            <div class="bold">pwm analysis</div>
+            max
+            <input id="pwmAnalysisMax" type="text" value="255" />
+            step
+            <input id="pwmAnalysisStep" type="text" value="20" />
+            <button id="pwmAnalysisRun">run</button>
+            <button id="pwmAnalysisDownload">download</button>
+          </div>
+        </div>
       </div>
       <div class="column border" style="flex: 1">
         <div class="row">
           <div class="bold">tuner</div>
           <button id="testOscillation">test oscillation</button>
         </div>
+
         <div class="row">
           <div class="bold">kp tuner</div>
           from
