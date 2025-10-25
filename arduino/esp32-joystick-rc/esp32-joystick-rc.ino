@@ -1,15 +1,15 @@
 #include <Bluepad32.h>
 
 // constant
-const uint8_t maxSpeed = 255;
+const uint8_t maxSpeed = 200;
 const uint8_t maxSteerSpeed = 80;
 const uint8_t spotTurnSpeed = 150;
 
 // PIN SETTING
 const uint8_t motorLPin1 = 25;   // swap pin1 and pin2 if motor is turning in the wrong direction
 const uint8_t motorLPin2 = 27;
-const uint8_t motorRPin1 = 32;
-const uint8_t motorRPin2 = 12;
+const uint8_t motorRPin1 = 12;
+const uint8_t motorRPin2 = 32;
 
 // GLOBAL VAR
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];

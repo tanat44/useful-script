@@ -6,7 +6,7 @@ const int motor1Pin2 = 27;
 const int motor1Pin1 = 25;
 const int motor2Pin1 = 32;
 const int motor2Pin2 = 12;
-const int pwmValue = 180;
+const int pwmValue = 200;
 int value = 0;
 
 void setup() {
