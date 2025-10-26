@@ -2,7 +2,7 @@
 
 // constant
 const uint8_t minPwm = 50;
-const uint8_t maxPwm = 230;
+const uint8_t maxPwm = 200;
 const uint8_t maxSteerSpeed = 150;
 const uint8_t spotTurnSpeed = 150;
 const uint16_t buttonL1 = 0x0010;
