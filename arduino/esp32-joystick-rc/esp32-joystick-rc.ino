@@ -1,9 +1,14 @@
 #include <Bluepad32.h>
 
 // constant
-const uint8_t maxSpeed = 200;
-const uint8_t maxSteerSpeed = 80;
+const uint8_t minPwm = 50;
+const uint8_t maxPwm = 230;
+const uint8_t maxSteerSpeed = 150;
 const uint8_t spotTurnSpeed = 150;
+const uint16_t buttonL1 = 0x0010;
+const uint16_t buttonL2 = 0x0040;
+const uint16_t buttonR1 = 0x0020;
+const uint16_t buttonR2 = 0x0080;
 
 // PIN SETTING
 const uint8_t motorLPin1 = 25;   // swap pin1 and pin2 if motor is turning in the wrong direction
@@ -13,9 +18,6 @@ const uint8_t motorRPin2 = 32;
 
 // GLOBAL VAR
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];
-int32_t currentPwmL = 0;
-int32_t currentPwmR = 0;
-
 
 // This callback gets called any time a new gamepad is connected.
 // Up to 4 gamepads can be connected at the same time.
@@ -56,62 +58,108 @@ void onDisconnectedController(ControllerPtr ctl) {
   }
 }
 
-void spotTurn(ControllerPtr ctl, int32_t* pwmL, int32_t* pwmR) {
-  int32_t steer = map(ctl->axisX(), -512, 512, -spotTurnSpeed, spotTurnSpeed);
-  *pwmL = steer;
-  *pwmR = -steer;
+void spotTurn(bool left, int32_t* pwmL, int32_t* pwmR) {
+  *pwmL = (left ? -1 : 1) * spotTurnSpeed;
+  *pwmR = (left ? 1 : -1) * spotTurnSpeed;
+}
+
+void tightTurn(bool left, int32_t* pwmL, int32_t* pwmR) {
+  *pwmL = left ? 0 : spotTurnSpeed;
+  *pwmR = left ? spotTurnSpeed : 0;
 }
 
 void driveAndSteer(ControllerPtr ctl, int32_t* pwmL, int32_t* pwmR) {
   int32_t steer = map(ctl->axisX(), -512, 512, -maxSteerSpeed, maxSteerSpeed);
-  int32_t accel = map(-ctl->axisRY(), -512, 512, -maxSpeed, maxSpeed);
-
-  int32_t pwmLeft = accel;
-  int32_t pwmRight = accel;
+  int32_t accel = map(-ctl->axisRY(), -512, 512, -255, 255);
+  int32_t left = accel;
+  int32_t right = accel;
 
   if (steer > 0) {
-    pwmRight -= steer;
-  } else {
-    pwmLeft += steer;
+    // turn right
+    if (right > 0) {
+      // forward
+      right -= steer;
+      if (right < 0)
+        right = 0;
+    } else {
+      // backward
+      right += steer;
+      if (right > 0)
+        right = 0;
+    }
+  } else if (steer < 0) {
+    // turn left
+    if (left > 0) {
+      // forward
+      left += steer;
+      if (left < 0)
+        left = 0;
+    } else {
+      // backward
+      left += steer;
+      if (right > 0) {
+        right = 0;
+      }
+    }
   }
 
-  *pwmL = map(pwmLeft, -maxSpeed, maxSpeed, 0, maxSpeed);
-  *pwmR = map(pwmRight, -maxSpeed, maxSpeed, 0, maxSpeed);
+  *pwmL = left;
+  *pwmR = right;
 }
 
 
 void dumpGamepad(ControllerPtr ctl) {
   int32_t steer = map(ctl->axisX(), -512, 512, -255, 255);
   int32_t accel = map(-ctl->axisRY(), -512, 512, -255, 255);
-
   int32_t pwmL = 0;
   int32_t pwmR = 0;
-  if (accel == 0) {
-    spotTurn(ctl, &pwmL, &pwmR);
-  } else {
+
+  uint16_t buttons = ctl->buttons();
+  bool isSpotTurnLeft = (buttons & buttonL2) == buttonL2;
+  bool isSpotTurnRight = (buttons & buttonR2) == buttonR2;
+  bool isTightTurnLeft = (buttons & buttonL1) == buttonL1;
+  bool isTightTurnRight = (buttons & buttonR1) == buttonR1;
+  
+
+  if ( isSpotTurnLeft && !isSpotTurnRight ) {
+    spotTurn(true, &pwmL, &pwmR);
+  } else if ( !isSpotTurnLeft && isSpotTurnRight ) {
+    spotTurn(false, &pwmL, &pwmR);
+  } else if ( isTightTurnLeft && !isTightTurnRight ) {
+    tightTurn(true, &pwmL, &pwmR);
+  } else if ( !isTightTurnLeft && isTightTurnRight ) {
+    tightTurn(false, &pwmL, &pwmR);
+  } else if ( abs(accel) > 20 ) {
     driveAndSteer(ctl, &pwmL, &pwmR);
   }
 
-  currentPwmL = pwmL;
-  currentPwmR = pwmR;
+  // pwmL and pwmR range is [-255, 255]
+  // actualPwmL and actualPwmR range is [minPwm, 255]
 
-  if (currentPwmL > 0) {
-    analogWrite(motorLPin1, abs(currentPwmL));
+  int16_t actualPwmL = map(abs(pwmL), 0, 255, minPwm, maxPwm);
+  int16_t actualPwmR = map(abs(pwmR), 0, 255, minPwm, maxPwm);
+  if (pwmL == 0) 
+    actualPwmL = 0;
+  if (pwmR == 0)
+    actualPwmR = 0;
+
+  if (pwmL > 0) {
+    analogWrite(motorLPin1, abs(actualPwmL));
     analogWrite(motorLPin2, 0);
   } else {
     analogWrite(motorLPin1, 0);
-    analogWrite(motorLPin2, abs(currentPwmL));
+    analogWrite(motorLPin2, abs(actualPwmL));
   }
 
-  if (currentPwmR > 0) {
-    analogWrite(motorRPin1, abs(currentPwmR));
+  if (pwmR > 0) {
+    analogWrite(motorRPin1, abs(actualPwmR));
     analogWrite(motorRPin2, 0);
   } else {
     analogWrite(motorRPin1, 0);
-    analogWrite(motorRPin2, abs(currentPwmR));
+    analogWrite(motorRPin2, abs(actualPwmR));
   }
 
-  Serial.printf("s=%d\ta=%d\t[L=%d, R=%d]\n", steer, accel, currentPwmL, currentPwmR);
+  Serial.printf("s=%d\ta=%d\pwm [L=%d, R=%d]\tactual [L=%d, R=%d]\n", steer, accel, pwmL, pwmR, actualPwmL, actualPwmR);
   return;
 
   Serial.printf(
