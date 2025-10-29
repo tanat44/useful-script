@@ -39,18 +39,18 @@
       retries: 10
       delay: 5
 
-    - name: install kubeconfig
+    - name: add kubeconfig to bashrc
       shell: |
         mkdir ~/.kube 2> /dev/null
+        export KUBECONFIG=~/.kube/config
+        echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc
+
+    - name: install kubeconfig
+      shell: |
         export KUBECONFIG=/home/tanut/.kube/config
         sudo k3s kubectl config view --raw > "$KUBECONFIG"
         chmod 777 "$KUBECONFIG"
       become: true
-
-    - name: add kubeconfig to bashrc
-      shell: |
-        export KUBECONFIG=~/.kube/config
-        echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc
 
     - name: copy nginx manifest
       copy:

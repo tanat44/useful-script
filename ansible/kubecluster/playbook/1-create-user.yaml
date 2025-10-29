@@ -5,6 +5,10 @@
       ansible.builtin.debug:
         msg: Hello world
 
+    - name: update hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+
     - name: creating with admin access
       user:
         name: "{{ username }}"
