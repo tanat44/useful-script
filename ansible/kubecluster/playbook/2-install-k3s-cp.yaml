@@ -41,6 +41,7 @@
 
     - name: install kubeconfig
       shell: |
+        mkdir ~/.kube 2> /dev/null
         export KUBECONFIG=/home/tanut/.kube/config
         sudo k3s kubectl config view --raw > "$KUBECONFIG"
         chmod 777 "$KUBECONFIG"
@@ -49,7 +50,6 @@
     - name: add kubeconfig to bashrc
       shell: |
         export KUBECONFIG=~/.kube/config
-        mkdir ~/.kube 2> /dev/null
         echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc
 
     - name: copy nginx manifest
