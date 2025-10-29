@@ -1,10 +1,9 @@
 - name: install brew
   shell: |
-    export NONINTERACTIVE=1
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/main | tar xz --strip-components 1 -C homebrew
     echo >> /home/tanut/.bashrc
-    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/tanut/.bashrc
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    echo 'eval "$(/home/tanut/homebrew/bin/brew shellenv)"' >> /home/tanut/.bashrc
+    eval "$(/home/tanut/homebrew/bin/brew shellenv)"
 
 - name: install gcc
   shell: |
@@ -13,4 +12,4 @@
 
 - name: install k9s
   shell: |
-    /home/linuxbrew/.linuxbrew/bin/brew install derailed/k9s/k9s
+    /home/tanut/homebrew/bin/brew install derailed/k9s/k9s

@@ -1,9 +1,9 @@
 myhosts:
   hosts:
     tanut1:
-      ansible_host: 46.224.9.4
+      ansible_host: 95.217.43.62
     tanut2:
-      ansible_host: 46.224.13.233
+      ansible_host: 88.99.214.157
     # tanut3:
     #   ansible_host: 46.224.9.5
     # tanut4:
