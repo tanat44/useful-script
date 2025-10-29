@@ -1,7 +1,9 @@
-- name: Check if Homebrew is already installed
-  ansible.builtin.stat:
-    path: "/home/linuxbrew/.linuxbrew/bin/brew"
-  register: brew_stat
+- name: install brew
+  shell: |
+    mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/main | tar xz --strip-components 1 -C homebrew
+    echo >> /home/tanut/.bashrc
+    echo 'eval "$(/home/tanut/homebrew/bin/brew shellenv)"' >> /home/tanut/.bashrc
+    eval "$(/home/tanut/homebrew/bin/brew shellenv)"
 
 - name: Create Homebrew directory
   ansible.builtin.file:
@@ -23,4 +25,4 @@
 
 - name: install k9s
   shell: |
-    /home/linuxbrew/.linuxbrew/bin/brew install derailed/k9s/k9s
+    /home/tanut/homebrew/bin/brew install derailed/k9s/k9s
