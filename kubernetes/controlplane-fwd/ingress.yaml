@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: controlplane-ingress
+  namespace: controlplane-fwd
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: my-control-plane.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-proxy-service
+            port: 
+              number: 80
+---
