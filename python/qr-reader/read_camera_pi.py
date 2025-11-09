@@ -25,13 +25,14 @@ while True:
     # detect qr
     results = qreader.detect(image=frame)
     for result in results:
+        # draw corner point
         for center in result["quad_xy"]:
-
             cv2.circle(frame, center.astype(np.int32), 5, (0,0,255), -1)
+
+        # draw recognize text
         text = qreader.decode(frame, result)
         if not text:
             continue
-
         top_left = result["quad_xy"][0].astype(np.int32)
         cv2.putText(frame, text, top_left, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
