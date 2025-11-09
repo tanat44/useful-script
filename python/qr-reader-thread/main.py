@@ -2,7 +2,7 @@ import time
 from queue import Queue
 from reader_worker import ReaderWorker
 
-WORKERS = 10
+WORKERS = 4
 JOBS = 20
 
 start_time = time.time()
