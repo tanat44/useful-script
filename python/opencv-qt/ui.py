@@ -5,7 +5,7 @@ from PyQt5.QtGui import QPixmap
 import cv2
 import numpy as np
 
-from VideoThread import VideoThread
+from video_thread import VideoThread
 
 class Ui(QWidget):
     def __init__(self):
