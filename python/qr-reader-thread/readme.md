@@ -26,7 +26,7 @@ number of jobs = 20 (# qr codes)
 | 100 | 8 | 19.0 (best 5.2 fps) |
 | 100 | 20 | 85.6 |
 
-# laptop i7-1370p
+# laptop i7-1370p (6 performance cores, 8 efficiency cores, 20 threads)
 on battery
 | jobs | workers | time (s) |
 | -- | -- | -- |
