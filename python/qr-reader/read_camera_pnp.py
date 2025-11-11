@@ -23,17 +23,18 @@ QR_POINTS = np.array([[-QR_WIDTH/2, QR_WIDTH/2, 0],
 
 # start
 qreader = QReader()
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(0, cv.CAP_V4L2)
+cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+cap.set(cv.CAP_PROP_FRAME_WIDTH, PIXEL_WIDTH)
+cap.set(cv.CAP_PROP_FRAME_HEIGHT, PIXEL_HEIGHT)
+
 if not cap.isOpened():
     print("Cannot open camera")
     exit()
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
-    WIDTH = cap.get(cv.CAP_PROP_FRAME_WIDTH)
-    HEIGHT = cap.get(cv.CAP_PROP_FRAME_HEIGHT)
-    # print(WIDTH, HEIGHT)
- 
+    
     # if frame is read correctly ret is True
     if not ret:
         print("Can't receive frame (stream end?). Exiting ...")
