@@ -13,8 +13,8 @@ def create_camera(id: int):
     return cam
 
 cv2.startWindowThread()
-camL = create_camera(0)
-camR = create_camera(1)
+camL = create_camera(1)
+camR = create_camera(0)
 y_shift = -55
 shift_matrix = np.float32([[1, 0, 0], [0, 1, y_shift]])
 stereo = cv2.StereoBM.create(numDisparities=16, blockSize=15)
@@ -31,14 +31,14 @@ while True:
     disparity = stereo.compute(frame_l_gray,frame_r_gray).astype(np.float32)
     
     # display image
-    w = 300
-    h = 200
+    w = 640
+    h = 480
     row0 = np.concatenate((cv2.resize(frameL, (w,h)), cv2.resize(frameR, (w,h))), axis=1)
     row1 = np.concatenate((cv2.resize(frame_l_gray, (w,h)), cv2.resize(frame_r_gray, (w,h))), axis=1)
     row1 = cv2.cvtColor(row1, cv2.COLOR_GRAY2BGR)
 
     output = np.concatenate((row0, row1), axis=0)
-    cv2.imshow('stereo camera', disparity)
+    cv2.imshow('stereo camera', output)
 
     if cv2.waitKey(1) == ord('q'):
         break
