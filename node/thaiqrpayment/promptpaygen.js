@@ -2,8 +2,28 @@ const QRCode = require("qrcode");
 const crc16 = require("crc/crc16ccitt");
 require("dotenv").config();
 
+// ref thai qr specification
+// https://www.bot.or.th/content/dam/bot/fipcs/documents/FPG/2562/ThaiPDF/25620084.pdf
+
 /**
- *
+ * @param {string} payString payment string excluding 'tag 63'
+ * @param {string} filename
+ */
+function generateQr(payString, filename) {
+  payString = `${payString}6304`;
+  const crc = crc16(payString).toString(16);
+  const crc4Digit = ("0000" + crc).slice(-4);
+  const final = `${payString}${crc4Digit.toUpperCase()}`;
+
+  console.log("generate qr: ", final);
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(final);
+  QRCode.toFile(`output/${filename}.png`, [
+    { data: new Uint8ClampedArray(bytes), mode: "byte" },
+  ]);
+}
+
+/**
  * @param {string} nationalId 13 digit
  * @param {string} amount
  */
@@ -13,7 +33,6 @@ function payToNationalId(nationalId, amount) {
 }
 
 /**
- *
  * @param {string} phoneNumber
  * @param {string} amount
  */
@@ -31,7 +50,7 @@ function payToPhone(phoneNumber, amount) {
 function genPromptPay(recipient, amount, fileSuffix) {
   // constant
   const a = "00020101021129370016";
-  const b = "A000000677010111";
+  const b = "A000000677010111"; // constant for merchant present code
   const c = "5802";
   const d = "TH54";
 
@@ -39,22 +58,40 @@ function genPromptPay(recipient, amount, fileSuffix) {
   let e = ("0" + amount.length).slice(-2);
   const f = "5303";
   const g = "764";
-  const h = "6304";
-  const combine = `${a}${b}${recipient}${c}${d}${e}${amount}${f}${g}${h}`;
-  const crcResult = crc16(combine).toString(16);
+  const combine = `${a}${b}${recipient}${c}${d}${e}${amount}${f}${g}`;
+  generateQr(combine, `promptpaygen-${fileSuffix}`);
+}
 
-  // generate promptpay qr
-  const payString = `${combine}${crcResult.toUpperCase()}`;
-  console.log("result", payString);
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(payString);
-  QRCode.toFile(`output/promptpay-${fileSuffix}.png`, [
-    { data: new Uint8ClampedArray(bytes), mode: "byte" },
-  ]);
+/**
+ * @param {string} amount
+ * @param {string} info
+ */
+function payToMerchant(amount, info) {
+  const a = "000201010211";
+
+  // merchant identifier
+  const merchantId = `0016A000000677010112011501075370008820502196Q310060J02851011JH03${info.length}${info}`;
+  const b = `30${merchantId.length}${merchantId}`;
+
+  const c = "5303764";
+
+  // amount
+  const amountLength = ("0" + amount.length).slice(-2);
+  const d = `54${amountLength}${amount}`;
+
+  const e = "5802TH";
+
+  // additional data template
+  const f = "622407200000IIoV07pAebtA1hf1";
+
+  // gencrc
+  const combine = `${a}${b}${c}${d}${e}${f}`;
+
+  generateQr(combine, "promptpaygen-merchant");
 }
 
 // input
-const phoneNumber = process.env.PHONE_NUMBER;
-const amount = "2.00";
-payToPhone(phoneNumber, amount);
+const amount = "3.00";
+payToPhone(process.env.PHONE_NUMBER, amount);
 payToNationalId(process.env.NATIONAL_ID, amount);
+payToMerchant(amount, "welcome-to-thailand");
