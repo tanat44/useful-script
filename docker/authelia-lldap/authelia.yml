@@ -24,8 +24,8 @@ services:
     image: 'traefik:v3.6.2'
     container_name: 'traefik'
     volumes:
-      - './traefik/config/traefik.yml:/traefik.yml:ro'
-      - './traefik/config/dynamic.yml:/dynamic.yml:ro'
+      - './traefik/config/traefik.yml:/etc/traefik/traefik.yml:ro'
+      - './traefik/config/dynamic:/etc/traefik/dynamic:ro'
       - './traefik/data/:/data'
       - './traefik/logs:/logs'
       - '/var/run/docker.sock:/var/run/docker.sock'

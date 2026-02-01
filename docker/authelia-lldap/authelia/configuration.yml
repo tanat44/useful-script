@@ -16,12 +16,6 @@ identity_validation:
   reset_password:
     jwt_secret: 'a_very_important_secret'
 
-# duo_api:
-#  hostname: api-123456789.example.com
-#  integration_key: ABCDEF
-#  # This secret can also be set using the env variables AUTHELIA_DUO_API_SECRET_KEY_FILE
-#  secret_key: 1234567890abcdefghifjkl
-
 authentication_backend:
   ldap:
     implementation: 'lldap'
@@ -41,6 +35,8 @@ access_control:
     - domain: 'secure.example.com'
       policy: 'one_factor'
     - domain: 'python.example.com'
+      policy: 'one_factor'
+    - domain: 'webapp.example.com'
       policy: 'one_factor'
 
 session:

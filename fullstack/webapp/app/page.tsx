@@ -1,7 +1,13 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import { headers } from "next/headers";
 
-export default function Home() {
+export default async function Home() {
+
+  const headersList = await headers()
+  const fwdHeader = Array.from(headersList.entries()).filter(x => x[0].startsWith("remote"))
+  console.log(fwdHeader)
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
