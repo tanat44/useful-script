@@ -1,72 +1,28 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-import { headers } from "next/headers";
+"use client"
 
-export default async function Home() {
+import { WebStorageStateStore } from "oidc-client-ts";
+import App from "./app";
+import { AuthProvider, AuthProviderProps } from "react-oidc-context";
+import { useEffect } from "react";
 
-  const headersList = await headers()
-  const fwdHeader = Array.from(headersList.entries()).filter(x => x[0].startsWith("remote"))
-  console.log(fwdHeader)
+const oidcConfig: AuthProviderProps = {
+  authority: "http://localhost:9000/application/o/webaoo",
+  client_id: "U3kvBTWINMgA18JJkmqdaH6YjYWExGSZvUAsOgOb",
+  redirect_uri:
+    "http://localhost:3000",
+  scope: "openid email profile",
+  userStore: typeof window !== "undefined" ? new WebStorageStateStore({ store:  window?.localStorage }) : undefined,
+};
+
+export default function Home() {
+
+  useEffect(() => {
+
+  }, [])
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <AuthProvider {...oidcConfig}>
+      <App />
+    </AuthProvider>
   );
 }
