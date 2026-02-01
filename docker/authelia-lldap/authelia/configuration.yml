@@ -40,7 +40,7 @@ access_control:
       policy: 'one_factor'
     - domain: 'secure.example.com'
       policy: 'one_factor'
-    - domain: 'lldap.example.com'
+    - domain: 'python.example.com'
       policy: 'one_factor'
 
 session:

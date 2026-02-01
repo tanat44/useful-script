@@ -1,4 +1,5 @@
 authelia/notification.txt
 authelia/db.sqlite3
-traefik
+traefik/data
+traefik/logs
 redis/dump.rdb

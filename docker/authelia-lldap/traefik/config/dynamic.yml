@@ -1,0 +1,24 @@
+http:
+  routers:
+    python-server-router:
+      rule: 'Host(`python.example.com`)'
+      entrypoints:
+        - https
+      middlewares:
+      - authelia@docker
+      service: python-server-service
+  services:
+    python-server-service:
+      loadBalancer:
+        servers:
+          - url: 'http://host.docker.internal:8000/'
+  middlewares:
+    authelia:
+      forwardAuth:
+        address: 'https://authelia:9091/api/authz/forward-auth'
+        trustForwardHeader: true
+        authResponseHeaders:
+          - 'Remote-User'
+          - 'Remote-Groups'
+          - 'Remote-Email'
+          - 'Remote-Name'
