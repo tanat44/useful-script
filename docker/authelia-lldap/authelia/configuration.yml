@@ -23,8 +23,12 @@ identity_validation:
 #  secret_key: 1234567890abcdefghifjkl
 
 authentication_backend:
-  file:
-    path: '/config/users_database.yml'
+  ldap:
+    implementation: 'lldap'
+    address: 'ldap://lldap:3890'
+    base_dn: 'DC=example,DC=com'
+    user: 'UID=admin,OU=people,DC=example,DC=com'
+    password: 'password'
 
 access_control:
   default_policy: 'deny'
@@ -35,6 +39,8 @@ access_control:
     - domain: 'traefik.example.com'
       policy: 'one_factor'
     - domain: 'secure.example.com'
+      policy: 'one_factor'
+    - domain: 'lldap.example.com'
       policy: 'one_factor'
 
 session:
@@ -47,12 +53,6 @@ session:
       authelia_url: 'https://authelia.example.com'
       expiration: '1 hour'
       inactivity: '5 minutes'
-
-  redis:
-    host: 'redis'
-    port: 6379
-    # This secret can also be set using the env variables AUTHELIA_SESSION_REDIS_PASSWORD_FILE
-    # password: authelia
 
 regulation:
   max_retries: 3
