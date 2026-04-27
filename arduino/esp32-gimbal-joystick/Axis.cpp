@@ -34,8 +34,7 @@ void Axis::tick() {
   raw = as5600->getCumulativePosition();
 }
 
-void Axis::setMinMax(int16_t _min, int16_t _max, bool _centering) {
-  centering = _centering;
+void Axis::setMinMax(int16_t _min, int16_t _max) {
   min = _min;
   max = _max;
 }
@@ -53,12 +52,29 @@ int16_t Axis::getRaw() {
 }
 
 int16_t Axis::getValue() {
-  float value = ((float)raw - min) / (max - min);
-  if (centering) value = (value-0.5f) * OUTPUT_RANGE * 2;
-  else value = value * OUTPUT_RANGE;
+  // clamp value
+  int16_t rawClamped = raw;
+  if (min < max) {
+    if (raw < min) rawClamped = min;
+    else if (raw > max) rawClamped = max;
+  } else {
+    if (raw > min) rawClamped = min;
+    else if (raw < max) rawClamped = max;
+  }
+
+  // convert to range [0,1]
+  float value = ((float)rawClamped - min) / (max - min);
+
+  // convert to range [-range, range]
+  value = (value * 2 - 1) * OUTPUT_RANGE;
+
+  // offset
   int16_t output = (int16_t)value;
   output += offset;
+
+  // deadzone
   if (abs(output) < zeroRange) output = 0;
+
   return output;
 }
 

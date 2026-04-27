@@ -17,7 +17,6 @@ private:
   int16_t zeroRange;
   int16_t offset;
   bool connected;
-  bool centering;
   AS5600* as5600;
   SoftWire* i2c;  // For Hardware I2C, Use Wire::TwoWire instead. Hardware is limited to 2 channels
 
@@ -27,7 +26,7 @@ public:
   void begin(uint8_t sda_pin, uint8_t scl_pin);
   void tick();
   void printRaw();
-  void setMinMax(int16_t _min, int16_t _max, bool _centering);
+  void setMinMax(int16_t _min, int16_t _max);
   void setZeroRange(int16_t value);
   void setCenterOffset(int16_t value);
   int16_t getRaw();

@@ -10,13 +10,13 @@ void Joystick::begin(uint8_t lh_sda_pin, uint8_t lh_scl_pin, uint8_t lv_sda_pin,
 
   // left gimbal
   left->begin(lh_sda_pin, lh_scl_pin, lv_sda_pin, lv_scl_pin);
-  left->configH(326, 1365, true, 60, 30);
-  left->configV(522, 1722, false, 0, 0);
+  left->configH(326, 1365, 60, 30);
+  left->configV(522, 1722, 0, 0);
 
   // right gimbal
   right->begin(rh_sda_pin, rh_scl_pin, rv_sda_pin, rv_scl_pin);
-  right->configH(-1178, -2242, true, 60, 18);
-  right->configV(-485, -1664, true, 20, 5);
+  right->configH(-1178, -2242, 60, 18);
+  right->configV(-485, -1664, 20, 5);
 }
 
 void Joystick::tick() {
@@ -39,8 +39,8 @@ void Joystick::printRaw() {
 }
 
 int16_t Joystick::mapToBleValue(int16_t value){
-  if (value > 1024) value = 1024;
-  else if (value < -1024) value = -1024;
-  int16_t output = (value + 1024) * 16;
+  if (value > 1023) value = 1023;
+  else if (value < -1023) value = -1023;
+  int16_t output = (value + 1023) * 16;
   return output;
 }

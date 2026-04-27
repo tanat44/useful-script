@@ -46,7 +46,7 @@ void fastLoop() {
   if (bleGamepad.isConnected()) {
     int16_t values[4];
     joystick->getValues(values);
-    bleGamepad.setAxes(values[0], values[1], values[2], values[3]);  //(X, Y, Z, RX, RY, RZ)
+    bleGamepad.setAxes(values[0], values[1], 0, values[2], values[3]);  //(X, Y, Z, RX, RY, RZ)
   } 
 }
 

@@ -17,14 +17,14 @@ void Gimbal::tick() {
   v->tick();
 }
 
-void Gimbal::configH(int16_t min, int16_t max, bool centering, int16_t zeroRange, int16_t offset) {
-  h->setMinMax(min, max, centering);
+void Gimbal::configH(int16_t min, int16_t max, int16_t zeroRange, int16_t offset) {
+  h->setMinMax(min, max);
   h->setZeroRange(zeroRange);
   h->setCenterOffset(offset);
 }
 
-void Gimbal::configV(int16_t min, int16_t max, bool centering, int16_t zeroRange, int16_t offset) {
-  v->setMinMax(min, max, centering);
+void Gimbal::configV(int16_t min, int16_t max, int16_t zeroRange, int16_t offset) {
+  v->setMinMax(min, max);
   v->setZeroRange(zeroRange);
   v->setCenterOffset(offset);
 }
