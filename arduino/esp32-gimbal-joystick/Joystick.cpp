@@ -25,10 +25,10 @@ void Joystick::tick() {
 }
 
 void Joystick::getValues(int16_t* out_values){
-  out_values[0] = (left->getValueH() + 1024) * 16;
-  out_values[1] = (left->getValueV() + 1024) * 16;
-  out_values[2] = (right->getValueH() + 1024) * 16;
-  out_values[3] = (right->getValueV() + 1024) * 16;
+  out_values[0] = mapToBleValue(left->getValueH());
+  out_values[1] = mapToBleValue(left->getValueV());
+  out_values[2] = mapToBleValue(right->getValueH());
+  out_values[3] = mapToBleValue(right->getValueV());
 }
 
 void Joystick::printRaw() {
@@ -36,4 +36,11 @@ void Joystick::printRaw() {
   Serial.print(" ");
   right->printRaw();
   Serial.println();
+}
+
+int16_t Joystick::mapToBleValue(int16_t value){
+  if (value > 1024) value = 1024;
+  else if (value < -1024) value = -1024;
+  int16_t output = (value + 1024) * 16;
+  return output;
 }

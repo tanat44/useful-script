@@ -7,6 +7,7 @@ class Joystick{
   private:
     Gimbal* left;
     Gimbal* right;
+    int16_t mapToBleValue(int16_t value);
 
   public:
     Joystick();
