@@ -15,6 +15,8 @@ class Gimbal {
     void tick();
     void configH(int16_t min, int16_t max, bool centering, int16_t zeroRange, int16_t offset);
     void configV(int16_t min, int16_t max, bool centering, int16_t zeroRange, int16_t offset);
+    int16_t getValueH();
+    int16_t getValueV();
     void printRaw();
 };
 

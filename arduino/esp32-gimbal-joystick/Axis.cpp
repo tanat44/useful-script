@@ -1,6 +1,7 @@
 #include "Axis.h"
 
-const float OUTPUT_RANGE = 512;
+// equivalent to -1024 to 1024
+const float OUTPUT_RANGE = 1024;
 
 uint8_t Axis::count = 0;
 
@@ -43,7 +44,7 @@ void Axis::setZeroRange(int16_t value) {
   zeroRange = value;
 }
 
-void Axis::setCenterOffset(int16_t value){
+void Axis::setCenterOffset(int16_t value) {
   offset = value;
 }
 
@@ -52,8 +53,9 @@ int16_t Axis::getRaw() {
 }
 
 int16_t Axis::getValue() {
-  float value = (raw - min) * OUTPUT_RANGE / (max - min);
-  if (centering) value = value - OUTPUT_RANGE / 2;
+  float value = ((float)raw - min) / (max - min);
+  if (centering) value = (value-0.5f) * OUTPUT_RANGE * 2;
+  else value = value * OUTPUT_RANGE;
   int16_t output = (int16_t)value;
   output += offset;
   if (abs(output) < zeroRange) output = 0;

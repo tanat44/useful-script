@@ -29,6 +29,14 @@ void Gimbal::configV(int16_t min, int16_t max, bool centering, int16_t zeroRange
   v->setCenterOffset(offset);
 }
 
+int16_t Gimbal::getValueH() {
+  return h->getValue();
+}
+
+int16_t Gimbal::getValueV() {
+  return v->getValue();
+}
+
 void Gimbal::printRaw() {
   Serial.print(name);
   Serial.print(": (");
