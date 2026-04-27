@@ -14,6 +14,8 @@ private:
   int16_t raw;
   int16_t min;
   int16_t max;
+  int16_t zeroRange;
+  int16_t offset;
   bool connected;
   bool centering;
   AS5600* as5600;
@@ -26,6 +28,8 @@ public:
   void tick();
   void printRaw();
   void setMinMax(int16_t _min, int16_t _max, bool _centering);
+  void setZeroRange(int16_t value);
+  void setCenterOffset(int16_t value);
   int16_t getRaw();
   int16_t getValue();
 };

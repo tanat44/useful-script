@@ -39,6 +39,14 @@ void Axis::setMinMax(int16_t _min, int16_t _max, bool _centering) {
   max = _max;
 }
 
+void Axis::setZeroRange(int16_t value) {
+  zeroRange = value;
+}
+
+void Axis::setCenterOffset(int16_t value){
+  offset = value;
+}
+
 int16_t Axis::getRaw() {
   return raw;
 }
@@ -47,6 +55,8 @@ int16_t Axis::getValue() {
   float value = (raw - min) * OUTPUT_RANGE / (max - min);
   if (centering) value = value - OUTPUT_RANGE / 2;
   int16_t output = (int16_t)value;
+  output += offset;
+  if (abs(output) < zeroRange) output = 0;
   return output;
 }
 
