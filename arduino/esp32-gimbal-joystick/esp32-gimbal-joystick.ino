@@ -12,7 +12,7 @@ BleGamepad bleGamepad = BleGamepad("t44's joystick", "tanat44", 100);
 Joystick* joystick;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   joystick = new Joystick();
   joystick->begin(12, 13, 10, 11, 3, 2, 5, 4);
@@ -27,10 +27,11 @@ void setup() {
 void loop() {
   joystick->tick();
   joystick->printRaw();
+
   if (bleGamepad.isConnected()) {
     int16_t values[4];
     joystick->getValues(values);
-    bleGamepad.setAxes(values[0], values[1], 0, values[3], values[4]);  //(X, Y, Z, RX, RY, RZ)
+    bleGamepad.setAxes(values[0], values[1], values[2], values[3]);  //(X, Y, Z, RX, RY, RZ)
     delay(1000);
   } else {
     Serial.println("ble: not connected");
