@@ -6,8 +6,8 @@
 class Gimbal {
   private:
     String name;
-    Axis h;
-    Axis v;
+    Axis* h;
+    Axis* v;
 
   public:
     Gimbal(String name);

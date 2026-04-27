@@ -4,16 +4,18 @@
 // Onboard RBG LED is at pin 21
 
 #include "AS5600.h"
-#include "Gimbal.h"
+#include "Joystick.h"
+// #include "Gimbal.h"
 #define LED_PIN 21
 
-Gimbal left = Gimbal("left");
+Joystick* joystick;
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("joystick started");
-  left.begin(12, 13, 10, 11);
+  // left.begin(12, 13, 10, 11);
 
+  joystick = new Joystick();
+  joystick->begin(12, 13, 10, 11, 3, 2, 5, 4);
   rgbLedWrite(LED_PIN, 0, 255, 0);
 
   delay(1000);
@@ -22,6 +24,8 @@ void setup() {
 
 void loop() {
   delay(1000);
-  left.tick();
-  left.print_raw();
+  joystick->tick();
+  joystick->print();
+  // left.tick();
+  // left.print_raw();
 }
