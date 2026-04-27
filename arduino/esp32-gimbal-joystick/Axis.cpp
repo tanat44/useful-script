@@ -1,15 +1,13 @@
 #include "Axis.h"
 
-uint8_t Axis::count = 0;
+const float OUTPUT_RANGE = 512;
 
-Axis::Axis()
-  : name("undefined") {}
+uint8_t Axis::count = 0;
 
 Axis::Axis(String _name)
   : name(_name) {
   id = Axis::count++;
-  // i2c = new TwoWire(id);
-  i2c = new SoftWire();
+  i2c = new SoftWire();  // i2c = new TwoWire(id);
   as5600 = new AS5600(i2c);
 }
 
@@ -32,11 +30,28 @@ void Axis::begin(uint8_t sda_pin, uint8_t scl_pin) {
 
 void Axis::tick() {
   if (!connected) return;
-  value = as5600->getCumulativePosition();
+  raw = as5600->getCumulativePosition();
 }
 
-void Axis::print_raw() {
+void Axis::setMinMax(int16_t _min, int16_t _max, bool _centering) {
+  centering = _centering;
+  min = _min;
+  max = _max;
+}
+
+int16_t Axis::getRaw() {
+  return raw;
+}
+
+int16_t Axis::getValue() {
+  float value = (raw - min) * OUTPUT_RANGE / (max - min);
+  if (centering) value = value - OUTPUT_RANGE / 2;
+  int16_t output = (int16_t)value;
+  return output;
+}
+
+void Axis::printRaw() {
   Serial.print(name);
   Serial.print(": ");
-  Serial.println(value);
+  Serial.println(raw);
 }

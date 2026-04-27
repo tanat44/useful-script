@@ -13,7 +13,9 @@ class Gimbal {
     Gimbal(String name);
     void begin(uint8_t h_sda_pin, uint8_t h_scl_pin, uint8_t v_sda_pin, uint8_t v_scl_pin);
     void tick();
-    void print_raw();
+    void configH(int16_t min, int16_t max, bool centering);
+    void configV(int16_t min, int16_t max, bool centering);
+    void printRaw();
 };
 
 #endif

@@ -2,7 +2,6 @@
 #define AXIS_H
 
 #include "ESP32_SoftWire.h"
-// #include "Wire.h"
 #include "AS5600.h"
 
 class Axis {
@@ -12,8 +11,11 @@ private:
 
   uint8_t id;
   String name;
-  int value;
+  int16_t raw;
+  int16_t min;
+  int16_t max;
   bool connected;
+  bool centering;
   AS5600* as5600;
   SoftWire* i2c;  // For Hardware I2C, Use Wire::TwoWire instead. Hardware is limited to 2 channels
 
@@ -22,10 +24,10 @@ public:
   Axis(String _name);
   void begin(uint8_t sda_pin, uint8_t scl_pin);
   void tick();
-  void print_raw();
-  int getValue() const {
-    return value;
-  }
+  void printRaw();
+  void setMinMax(int16_t _min, int16_t _max, bool _centering);
+  int16_t getRaw();
+  int16_t getValue();
 };
 
 #endif

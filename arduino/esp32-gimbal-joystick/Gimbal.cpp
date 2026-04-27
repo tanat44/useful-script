@@ -1,12 +1,13 @@
 #include "Gimbal.h"
 #include "Axis.h"
 
-Gimbal::Gimbal(String _name): name(_name) {
+Gimbal::Gimbal(String _name)
+  : name(_name) {
   h = new Axis(name + "_h");
   v = new Axis(name + "_v");
 }
 
-void Gimbal::begin(uint8_t h_sda_pin, uint8_t h_scl_pin, uint8_t v_sda_pin, uint8_t v_scl_pin){
+void Gimbal::begin(uint8_t h_sda_pin, uint8_t h_scl_pin, uint8_t v_sda_pin, uint8_t v_scl_pin) {
   h->begin(h_sda_pin, h_scl_pin);
   v->begin(v_sda_pin, v_scl_pin);
 }
@@ -16,7 +17,15 @@ void Gimbal::tick() {
   v->tick();
 }
 
-void Gimbal::print_raw() {
+void Gimbal::configH(int16_t min, int16_t max, bool centering) {
+  h->setMinMax(min, max, centering);
+}
+
+void Gimbal::configV(int16_t min, int16_t max, bool centering) {
+  v->setMinMax(min, max, centering);
+}
+
+void Gimbal::printRaw() {
   Serial.print(name);
   Serial.print(": (");
   Serial.print(h->getValue());
