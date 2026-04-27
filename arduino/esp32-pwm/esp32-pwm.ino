@@ -37,14 +37,12 @@ void setup() {
 
   ledcAttach(motorPin1, freq, resolution);
   ledcAttach(motorPin2, freq, resolution);
-  rgbLedWrite(ledPin, 0, 255, 0);
 
   delay(1000);
 }
 
 
 void loop() {
-  return;
   static uint32_t lastTime = 0;
 
   //  update every 100 ms. should be enough up to ~200 RPM
