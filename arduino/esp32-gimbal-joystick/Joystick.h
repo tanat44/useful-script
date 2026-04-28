@@ -14,6 +14,10 @@ class Joystick{
     void begin(uint8_t lh_sda_pin, uint8_t lh_scl_pin, uint8_t lv_sda_pin, uint8_t lv_scl_pin, uint8_t rh_sda_pin, uint8_t rh_scl_pin, uint8_t rv_sda_pin, uint8_t rv_scl_pin);
     void tick();
     /**
+    Output values from left and right gimbals. Expect int16_t array of length 4. Value range from -1024 to 1024
+    */
+    void getRaw(int16_t* out_values);
+    /**
     Output values from left and right gimbals. Expect int16_t array of length 4. Value range from 0-32767
     */
     void getValues(int16_t* out_values);

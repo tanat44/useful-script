@@ -24,6 +24,13 @@ void Joystick::tick() {
   right->tick();
 }
 
+void Joystick::getRaw(int16_t* out_values){
+  out_values[0] = left->getValueH();
+  out_values[1] = left->getValueV();
+  out_values[2] = right->getValueH();
+  out_values[3] = right->getValueV();
+}
+
 void Joystick::getValues(int16_t* out_values){
   out_values[0] = mapToBleValue(left->getValueH());
   out_values[1] = mapToBleValue(left->getValueV());
