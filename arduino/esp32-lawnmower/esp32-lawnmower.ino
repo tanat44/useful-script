@@ -7,13 +7,11 @@ ModeSelection* modeSelection;
 
 void setup() {
   Serial.begin(115200);
-  
+
   modeSelection = new ModeSelection();
   ledcAttach(ACCEL_OUT_PIN, 12000, 8);
   ledcAttach(STEER_OUT_PIN, 12000, 8);
   analogReadResolution(12);
-
-  rgbLedWrite(RGB_BUILTIN, 0, 255, 0);
 }
 
 void loop() {

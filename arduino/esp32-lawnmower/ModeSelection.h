@@ -11,15 +11,15 @@ enum Mode {
 };
 
 class ModeSelection {
-  private:
-    uint8_t count;
-    Mode mode;
-    void blink();
+private:
+  uint8_t count;
+  Mode mode;
+  void blink();
 
-  public:
-    ModeSelection();
-    void tick();
-    Mode getMode();
+public:
+  ModeSelection();
+  void tick();
+  Mode getMode();
 };
 
 #endif

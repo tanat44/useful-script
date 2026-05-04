@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "Const.h"
- #include "ModeSelection.h"
+#include "ModeSelection.h"
 
 #define SELECT_THRESHOLD 2800
 #define WAIT_CYCLE 5
@@ -22,9 +22,11 @@ void ModeSelection::tick() {
   if (value > SELECT_THRESHOLD) {
     mode = Mode::SLAVE;
     Serial.println("mode: slave");
+    rgbLedWrite(LED_PIN, 0, 0, 255);
   } else if (count > WAIT_CYCLE) {
     mode = Mode::PASSTHROUGH;
     Serial.println("mode: passthrough");
+    rgbLedWrite(LED_PIN, 0, 255, 0);
   }
 }
 
