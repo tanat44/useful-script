@@ -78,10 +78,10 @@ void fastLoop() {
     } else if (webControl->isReady()) {
       webControl->tick();
       Command command = webControl->getCommand();
-      accel = (uint16_t)(command.accel * 2048) + 2047;
-      steer = (uint16_t)(command.steer * 2048) + 2047;
-      lift = (uint16_t)(command.lift * 2048) + 2047;
-      engine = (uint16_t)(command.engine * 2048) + 2047;
+      accel = (uint16_t)(command.accel * 2047) + 2048;
+      steer = (uint16_t)(command.steer * 2047) + 2048;
+      lift = (uint16_t)(command.lift * 2047) + 2048;
+      engine = (uint16_t)(command.engine * 2047) + 2048;
     }
   }
 }
