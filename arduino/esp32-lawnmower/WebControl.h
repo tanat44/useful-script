@@ -8,6 +8,7 @@ class WebControl {
 private:
   static WebServer *server;
   static Command command;
+  static int lastTime;
   static void handleRoot();
   static void handleNotFound();
   static void handleLawnMover();
@@ -15,7 +16,6 @@ private:
   void resetCommand();
 
   bool ready;
-  int lastTime;
 
 public:
   WebControl();

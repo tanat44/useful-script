@@ -35,8 +35,10 @@ void ModeSelection::tick() {
 
   if (value > SELECT_THRESHOLD) {
     mode = Mode::SLAVE;
+    chooseMode();
   } else if (count > WAIT_CYCLE) {
     mode = Mode::PASSTHROUGH;
+    chooseMode();
   }
 }
 

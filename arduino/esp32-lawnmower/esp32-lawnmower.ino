@@ -2,12 +2,15 @@
 #include "ModeSelection.h"
 #include "WebControl.h"
 
-#define DEFAULT_MODE Mode::SLAVE
+#define DEFAULT_MODE Mode::UNKNOWN
 
-uint16_t accel = 2048;
-uint16_t steer = 2048;
-uint16_t lift = 2048;
-uint16_t engine = 2048;
+uint8_t accel = 128;
+uint8_t steer = 128;
+uint8_t lift = 128;
+uint8_t engine = 128;
+uint16_t liftRead = 0;
+uint16_t engineRead = 0;
+
 ModeSelection *modeSelection;
 WebControl *webControl;
 
@@ -25,6 +28,11 @@ void setup() {
 void loop() {
   static uint32_t lastTime1 = 0;
   static uint32_t lastTime2 = 0;
+
+  ledcWrite(ACCEL_OUT_PIN, accel);
+  ledcWrite(STEER_OUT_PIN, steer);
+  ledcWrite(LIFT_OUT_PIN, lift);
+  ledcWrite(ENGINE_OUT_PIN, engine);
 
   if (modeSelection->getMode() == Mode::UNKNOWN) {
     modeSelection->tick();
@@ -47,29 +55,27 @@ void loop() {
 
 
 void fastLoop() {
-  // read input
-  accel = analogRead(ACCEL_IN_PIN);
-  steer = analogRead(STEER_IN_PIN);
-  lift = analogRead(LIFT_IN_PIN);
-  engine = analogRead(ENGINE_IN_PIN);
 
   // output
   if (modeSelection->getMode() == Mode::PASSTHROUGH) {
-    ledcWrite(ACCEL_OUT_PIN, accel >> 4);
-    ledcWrite(STEER_OUT_PIN, steer >> 4);
-    if (lift > SWITCH_HIGH_THRES) {
-      ledcWrite(LIFT_OUT_PIN, 255);
-    } else if (lift < SWITCH_LOW_THRES) {
-      ledcWrite(LIFT_OUT_PIN, 0);
+    accel = analogRead(ACCEL_IN_PIN) >> 4;
+    steer = analogRead(STEER_IN_PIN) >> 4;
+    liftRead = analogRead(LIFT_IN_PIN);
+    engineRead = analogRead(ENGINE_IN_PIN);
+
+    if (liftRead > SWITCH_HIGH_THRES) {
+      lift = 255;
+    } else if (liftRead < SWITCH_LOW_THRES) {
+      lift = 0;
     } else {
-      ledcWrite(LIFT_OUT_PIN, 128);
+      lift = 128;
     }
-    if (engine > SWITCH_HIGH_THRES) {
-      ledcWrite(ENGINE_OUT_PIN, 255);
-    } else if (engine < SWITCH_LOW_THRES) {
-      ledcWrite(ENGINE_OUT_PIN, 0);
+    if (engineRead > SWITCH_HIGH_THRES) {
+      engine = 255;
+    } else if (engineRead < SWITCH_LOW_THRES) {
+      engine = 0;
     } else {
-      ledcWrite(ENGINE_OUT_PIN, 128);
+      engine = 128;
     }
   } else if (modeSelection->getMode() == Mode::SLAVE) {
     if (webControl == NULL) {
@@ -78,10 +84,10 @@ void fastLoop() {
     } else if (webControl->isReady()) {
       webControl->tick();
       Command command = webControl->getCommand();
-      accel = (uint16_t)(command.accel * 2047) + 2048;
-      steer = (uint16_t)(command.steer * 2047) + 2048;
-      lift = (uint16_t)(command.lift * 2047) + 2048;
-      engine = (uint16_t)(command.engine * 2047) + 2048;
+      accel = (uint8_t)(command.accel * 127) + 128;
+      steer = (uint8_t)(command.steer * 127) + 128;
+      lift = (uint8_t)(command.lift * 127) + 128;
+      engine = (uint8_t)(command.engine * 127) + 128;
     }
   }
 }

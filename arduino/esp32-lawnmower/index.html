@@ -1,0 +1,64 @@
+<html>
+  <body>
+    <script>
+      const ip = "http://192.168.1.43";
+      const controls = ["accel", "steer", "lift", "engine"];
+      const values = [-1.0, -0.5, -0.2, 0, 0.2, 0.5, 1];
+
+      const body = document.body;
+
+      document.onkeydown = (e) => {
+        const speed = 1.0;
+        switch (e.key) {
+          case "ArrowUp":
+            send("accel", speed);
+            break;
+          case "ArrowDown":
+            send("accel", -speed);
+            break;
+          case "ArrowRight":
+            send("steer", speed);
+            break;
+          case "ArrowLeft":
+            send("steer", -speed);
+            break;
+        }
+      };
+
+      const ipDom = document.createElement("div");
+      ipDom.innerText = `ip: ${ip}`;
+      body.appendChild(ipDom);
+
+      controls.forEach((control) => {
+        const element = document.createElement("div");
+        element.innerText = control;
+        body.appendChild(element);
+
+        values.forEach((value) => {
+          const button = document.createElement("button");
+          button.innerText = value;
+          element.appendChild(button);
+          button.onclick = () => {
+            send(control, value);
+          };
+        });
+      });
+
+      async function send(key, value) {
+        const formData = new FormData();
+        controls.forEach((control) => {
+          if (control !== key) {
+            formData.append(control, 0);
+          } else {
+            formData.append(key, value);
+          }
+        });
+
+        const res = await fetch(`${ip}/lawnmower`, {
+          method: "POST",
+          body: formData,
+        });
+      }
+    </script>
+  </body>
+</html>

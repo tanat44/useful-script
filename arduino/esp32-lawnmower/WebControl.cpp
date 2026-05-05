@@ -8,9 +8,10 @@
 
 WebServer *WebControl::server;
 Command WebControl::command;
+int WebControl::lastTime = 0;
 
 WebControl::WebControl()
-  : ready(false), lastTime(0) {
+  : ready(false) {
   // lazy initialization of webserver to save memory
   WebControl::server = new WebServer(80);
   resetCommand();
@@ -55,6 +56,7 @@ void WebControl::handleLawnMover() {
   command.lift = WebControl::processInput(WebControl::server->arg(2));
   command.engine = WebControl::processInput(WebControl::server->arg(3));
   WebControl::server->send(200, "text/plain", message);
+  WebControl::lastTime = millis();
 }
 
 void WebControl::setup(void) {
@@ -77,12 +79,10 @@ void WebControl::setup(void) {
     Serial.println("MDNS responder started");
   }
 
+  WebControl::server->enableCORS();
   WebControl::server->on("/", WebControl::handleRoot);
-
-  WebControl::server->on("/lawnmover", WebControl::handleLawnMover);
-
+  WebControl::server->on("/lawnmower", WebControl::handleLawnMover);
   WebControl::server->onNotFound(WebControl::handleNotFound);
-
   WebControl::server->begin();
   Serial.println("HTTP server started");
   ready = true;
@@ -91,8 +91,8 @@ void WebControl::setup(void) {
 void WebControl::tick() {
   WebControl::server->handleClient();
 
-  if (millis() - lastTime > COMMAND_SUSTAIN_MS) {
-    lastTime = millis();
+  if (millis() - WebControl::lastTime > COMMAND_SUSTAIN_MS) {
+    WebControl::lastTime = millis();
     resetCommand();
   }
 }
@@ -114,7 +114,7 @@ Command WebControl::getCommand() {
 }
 
 float WebControl::processInput(const String &text) {
-  float x = text.toFloat();
+  float x = text.toFloat() * -1.f;
   if (x > 1.f) x = 1.f;
   else if (x < -1.f) x = -1.f;
   return x;
