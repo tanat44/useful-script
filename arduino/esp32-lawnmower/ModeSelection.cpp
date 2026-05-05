@@ -6,7 +6,7 @@
 #define WAIT_CYCLE 5
 
 ModeSelection::ModeSelection()
-  : mode(Mode::UNKNOWN) {}
+  : mode(Mode::UNKNOWN), count(0) {}
 
 void ModeSelection::tick() {
   if (mode != Mode::UNKNOWN) {
@@ -16,7 +16,7 @@ void ModeSelection::tick() {
   Serial.println("use left stick to choose mode");
   blink();
 
-  static int value;
+  static int value = 0;
   value = analogRead(ACCEL_IN_PIN);
 
   if (value > SELECT_THRESHOLD) {

@@ -3,6 +3,8 @@
 
 uint16_t accel;
 uint16_t steer;
+uint16_t lift;
+uint16_t engine;
 ModeSelection* modeSelection;
 
 void setup() {
@@ -11,6 +13,8 @@ void setup() {
   modeSelection = new ModeSelection();
   ledcAttach(ACCEL_OUT_PIN, 12000, 8);
   ledcAttach(STEER_OUT_PIN, 12000, 8);
+  ledcAttach(LIFT_OUT_PIN, 12000, 8);
+  ledcAttach(ENGINE_OUT_PIN, 12000, 8);
   analogReadResolution(12);
 }
 
@@ -42,11 +46,27 @@ void fastLoop() {
   // input
   accel = analogRead(ACCEL_IN_PIN);
   steer = analogRead(STEER_IN_PIN);
+  lift = analogRead(LIFT_IN_PIN);
+  engine = analogRead(ENGINE_IN_PIN);
 
   // output
   if (modeSelection->getMode() == Mode::PASSTHROUGH) {
     ledcWrite(ACCEL_OUT_PIN, accel >> 4);
     ledcWrite(STEER_OUT_PIN, steer >> 4);
+    if (lift > SWITCH_HIGH_THRES) {
+      ledcWrite(LIFT_OUT_PIN, 255);
+    } else if (lift < SWITCH_LOW_THRES) {
+      ledcWrite(LIFT_OUT_PIN, 0);
+    } else {
+      ledcWrite(LIFT_OUT_PIN, 128);
+    }
+    if (engine > SWITCH_HIGH_THRES) {
+      ledcWrite(ENGINE_OUT_PIN, 255);
+    } else if (engine < SWITCH_LOW_THRES) {
+      ledcWrite(ENGINE_OUT_PIN, 0);
+    } else {
+      ledcWrite(ENGINE_OUT_PIN, 128);
+    }
   }
 }
 
@@ -55,5 +75,9 @@ void slowLoop() {
   Serial.print(accel);
   Serial.print("\tsteer = ");
   Serial.print(steer);
+  Serial.print("\tlift = ");
+  Serial.print(lift);
+  Serial.print("\tengine = ");
+  Serial.print(engine);
   Serial.println();
 }
