@@ -15,9 +15,10 @@ private:
   uint8_t count;
   Mode mode;
   void blink();
+  void chooseMode();
 
 public:
-  ModeSelection();
+  ModeSelection(Mode defaultMode);
   void tick();
   Mode getMode();
 };
