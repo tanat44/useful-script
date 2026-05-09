@@ -4,6 +4,10 @@
 
 #define DEFAULT_MODE Mode::UNKNOWN
 
+uint8_t lastAccel = 128;
+uint8_t lastSteer = 128;
+uint8_t lastLift = 128;
+uint8_t lastEngine = 128;
 uint8_t accel = 128;
 uint8_t steer = 128;
 uint8_t lift = 128;
@@ -89,17 +93,42 @@ void fastLoop() {
       lift = (uint8_t)(command.lift * 127) + 128;
       engine = (uint8_t)(command.engine * 127) + 128;
     }
+    printCommand();
   }
 }
 
 void slowLoop() {
-  Serial.print("accel = ");
-  Serial.print(accel);
-  Serial.print("\tsteer = ");
-  Serial.print(steer);
-  Serial.print("\tlift = ");
-  Serial.print(lift);
-  Serial.print("\tengine = ");
-  Serial.print(engine);
-  Serial.println();
+  // do nothing
+}
+
+void printCommand() {
+  static bool changed;
+  changed = false;
+  if (accel != lastAccel) {
+    changed = true;
+    lastAccel = accel;
+  }
+  if (steer != lastSteer) {
+    changed = true;
+    lastSteer = steer;
+  }
+  if (lift != lastLift) {
+    changed = true;
+    lastLift = lift;
+  }
+  if (engine != lastEngine) {
+    changed = true;
+    lastEngine = engine;
+  }
+  if (changed) {
+    Serial.print("accel = ");
+    Serial.print(accel);
+    Serial.print("\tsteer = ");
+    Serial.print(steer);
+    Serial.print("\tlift = ");
+    Serial.print(lift);
+    Serial.print("\tengine = ");
+    Serial.print(engine);
+    Serial.println();
+  }
 }

@@ -2,9 +2,10 @@
 #include <NetworkClient.h>
 #include <ESPmDNS.h>
 #include "Ssid.h"
+#include "Const.h"
 #include "WebControl.h"
 
-#define COMMAND_SUSTAIN_MS 1000
+#define COMMAND_SUSTAIN_MS 500
 
 WebServer *WebControl::server;
 Command WebControl::command;
@@ -57,16 +58,23 @@ void WebControl::handleLawnMover() {
   command.engine = WebControl::processInput(WebControl::server->arg(3));
   WebControl::server->send(200, "text/plain", message);
   WebControl::lastTime = millis();
+
+  // blink white light on reveiced command
+  rgbLedWrite(LED_PIN, 255, 255, 255);
 }
 
 void WebControl::setup(void) {
   WiFi.mode(WIFI_STA);
+  WiFi.setSleep(WIFI_PS_NONE);    // disable power saving
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("");
 
-  // Wait for connection
+  // Wait for connection (blink blue light while not connected)
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(300);
+    rgbLedWrite(LED_PIN, 0, 0, 0);
+    delay(300);
+    rgbLedWrite(LED_PIN, 0, 0, 255);
     Serial.print(".");
   }
   Serial.println("");
@@ -89,6 +97,7 @@ void WebControl::setup(void) {
 }
 
 void WebControl::tick() {
+  rgbLedWrite(LED_PIN, 0, 0, 255);
   WebControl::server->handleClient();
 
   if (millis() - WebControl::lastTime > COMMAND_SUSTAIN_MS) {
