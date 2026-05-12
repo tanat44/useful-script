@@ -12,7 +12,12 @@ Experiment setup:
 ## Experiment result
 
 1. Depends on how you look at. Most of the runs global allocation yields +10% performance at 1e6 allocations per seconds.
+
 1. Once we start varying the number of allocations, the performance gain changes. More allocation rates, less gain (differences). I suppose this results are impacted by numbercial precision in time measurement. More allocations -> longer it takes -> more precise time measurement -> less gain.
+
+1. Inconclusive test1 and test2
+![test1](docs/test1.png)
+![test2](docs/test2.png)
 
 
 ## Conclude
