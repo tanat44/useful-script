@@ -5,8 +5,8 @@ These a long standing belief that memory allocation costs performance. This sket
 Experiment setup:
 1. Assume jobs that run on high frequency -- mouse move event. This event is triggered at about 100FPS or 10ms.
 1. Choices that we have when the event is triggered:
-    A - new Quaternion() for temporary calculation
-    B - Reuse globally allocated Quaternion for temporary calculation
+    - A - new Quaternion() for temporary calculation
+    - B - Reuse globally allocated Quaternion for temporary calculation
 1. Since the above step tooks so little time, we do it for 1e4 repetitions, so that the cpu time is significant & measurable
 
 ## Experiment result
