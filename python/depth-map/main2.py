@@ -3,7 +3,6 @@ import numpy as np
 import cv2
 from picamera2 import Picamera2
 from libcamera import controls, Transform
-import time
 
 def create_camera(id: int):
     cam = Picamera2(id)
@@ -30,10 +29,10 @@ cv2.createTrackbar('speckleWindowSize','disp',3,25,nothing)
 cv2.createTrackbar('disp12MaxDiff','disp',5,25,nothing)
 cv2.createTrackbar('minDisparity','disp',5,25,nothing)
 stereo = cv2.StereoBM_create()
-camL = create_camera(0)
-camR = create_camera(1)
+camL = create_camera(1)
+camR = create_camera(0)
 
-y_shift = -55
+y_shift = 0
 shift_matrix = np.float32([[1, 0, 0], [0, 1, y_shift]])
 
 while True:

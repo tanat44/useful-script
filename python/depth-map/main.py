@@ -15,7 +15,7 @@ def create_camera(id: int):
 cv2.startWindowThread()
 camL = create_camera(1)
 camR = create_camera(0)
-y_shift = -55
+y_shift = 0
 shift_matrix = np.float32([[1, 0, 0], [0, 1, y_shift]])
 stereo = cv2.StereoBM.create(numDisparities=16, blockSize=15)
 
