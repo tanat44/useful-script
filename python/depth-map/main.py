@@ -9,7 +9,7 @@ import time
 def create_camera(id: int):
     cam = Picamera2(id)
     cam.configure(cam.create_preview_configuration(
-        main={"format": 'RGB888'}, transform=Transform(hflip=True)))
+        main={"format": 'RGB888'}, transform=Transform(hflip=False)))
     # AfMode: 0=manual, 1=auto, 2=continuous
     # LensPosition: 0-15 (0 is infinite, 15 is closest)
     cam.set_controls({'AfMode': 0, 'LensPosition': 2})
