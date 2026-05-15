@@ -2,9 +2,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import cv2
 from picamera2 import Picamera2
-from libcamera import controls, Transform
-import time
-
+from libcamera import Transform
 
 def create_camera(id: int):
     cam = Picamera2(id)
@@ -19,7 +17,9 @@ def create_camera(id: int):
 cv2.startWindowThread()
 camL = create_camera(1)
 camR = create_camera(0)
-stereo = cv2.StereoBM.create(numDisparities=16, blockSize=15)
+disparity_multiple = 7
+block_size = 15
+stereo = cv2.StereoSGBM.create(numDisparities=disparity_multiple * 16, blockSize=block_size)
 w = 320
 h = 240
 
@@ -35,14 +35,16 @@ while True:
     # capture
     frame_l = camL.capture_array()
     frame_l = cv2.remap(frame_l, xmap1, ymap1, cv2.INTER_LINEAR)
+    frame_l = cv2.resize(frame_l, (w,h))
     frame_r = camR.capture_array()
     frame_r = cv2.remap(frame_r, xmap2, ymap2, cv2.INTER_LINEAR)
+    frame_r = cv2.resize(frame_r, (w,h))
 
     # disparity
     frame_l_gray = cv2.cvtColor(frame_l, cv2.COLOR_BGR2GRAY)
     frame_r_gray = cv2.cvtColor(frame_r, cv2.COLOR_BGR2GRAY)
     disparity = stereo.compute(frame_l_gray, frame_r_gray).astype(np.float32)
-    disparity = cv2.resize(disparity, (w, h))
+    disparity = disparity / disparity_multiple
 
     # display raw
     row_0 = np.hstack((frame_l, frame_r))
