@@ -19,8 +19,6 @@ def create_camera(id: int):
 cv2.startWindowThread()
 camL = create_camera(1)
 camR = create_camera(0)
-y_shift = 0
-shift_matrix = np.float32([[1, 0, 0], [0, 1, y_shift]])
 stereo = cv2.StereoBM.create(numDisparities=16, blockSize=15)
 w = 640
 h = 480
@@ -31,8 +29,6 @@ while True:
     frame_l = cv2.resize(frame_l, (w,h))
     frame_r = camR.capture_array()
     frame_r = cv2.resize(frame_r, (w,h))
-    frame_r = cv2.warpAffine(frame_r, shift_matrix,
-                            (frame_r.shape[1], frame_r.shape[0]))
 
     # disparity
     frame_l_gray = cv2.cvtColor(frame_l, cv2.COLOR_BGR2GRAY)
