@@ -56,5 +56,5 @@ while True:
     output = np.hstack((output, disparity_col))
     cv2.imshow('stereo camera', output)
 
-    if cv2.waitKey(1) == ord('q'):
+    if cv2.waitKey(1) == 27:
         break

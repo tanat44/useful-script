@@ -6,8 +6,8 @@ from libcamera import controls, Transform
 
 def create_camera(id: int):
     cam = Picamera2(id)
-    cam.configure(cam.create_preview_configuration(main={"format": 'RGB888'}, transform=Transform(hflip=True)))
-    cam.set_controls({'AfMode': controls.AfModeEnum.Continuous})
+    cam.configure(cam.create_preview_configuration(main={"format": 'RGB888'}, transform=Transform(hflip=False)))
+    cam.set_controls({'AfMode': 0})
     cam.start()
     return cam
 
