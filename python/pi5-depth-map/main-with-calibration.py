@@ -18,7 +18,7 @@ cv2.startWindowThread()
 camL = create_camera(1)
 camR = create_camera(0)
 disparity_multiple = 7
-block_size = 15
+block_size = 23
 stereo = cv2.StereoSGBM.create(numDisparities=disparity_multiple * 16, blockSize=block_size)
 w = 320
 h = 240
@@ -53,8 +53,11 @@ while True:
     output = np.vstack((row_0, row_1))
 
     # display disparity
+    disp_gray = cv2.cvtColor(disparity, cv2.COLOR_GRAY2BGR)
+    disp_color = cv2.applyColorMap(disp_gray.astype(np.uint8), cv2.COLORMAP_JET)
     disparity_col = np.zeros((np.size(output,0), w, 3), np.uint8)
-    disparity_col[0:h,0:w] = cv2.cvtColor(disparity, cv2.COLOR_GRAY2BGR)
+    disparity_col[0:h,0:w] = disp_color
+    disparity_col[h:,0:w] = disp_gray
     output = np.hstack((output, disparity_col))
     cv2.imshow('stereo camera', output)
 

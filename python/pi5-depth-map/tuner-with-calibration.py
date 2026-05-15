@@ -80,10 +80,7 @@ while True:
     disparity = stereo.compute(imgL_gray,imgR_gray)
      
     # Converting to float32 
-    disparity = disparity.astype(np.float32)
- 
-    # Scaling down the disparity values and normalizing them 
-    disparity = (disparity/16.0 - minDisparity)/numDisparities
+    disparity =( disparity).astype(np.uint8)
  
     # Displaying the disparity map
     cv2.imshow("disp",disparity)
