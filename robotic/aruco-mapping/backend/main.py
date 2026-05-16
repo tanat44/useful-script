@@ -67,7 +67,7 @@ while True:
             MARKER_POINTS, corners, camera_matrix, None)
         if not success:
             continue
-        marker = Marker(id, tran.flatten(), rot.flatten(), 123.0)
+        marker = Marker(id, tran.flatten()/1000, rot.flatten(), 123.0)
         markers.append(marker)
 
     recog_marker = RecogMarkers(time, markers)

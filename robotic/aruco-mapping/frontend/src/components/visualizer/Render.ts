@@ -56,15 +56,10 @@ export class Render {
     return pathMesh
   }
 
-  static createSphere(
-    center: Vector2,
-    z: number,
-    radius: number,
-    material: Material
-  ) {
+  static createSphere(pos: Vector3, radius: number, material: Material) {
     const geometry = new SphereGeometry(radius)
     const sphere = new Mesh(geometry, material)
-    sphere.position.set(center.x, center.y, z)
+    sphere.position.set(pos.x, pos.y, pos.z)
     return sphere
   }
 }

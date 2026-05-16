@@ -57,10 +57,9 @@ export class Visualizer {
 
   private async createObjects() {
     // await this.text.load()
-    const mat = Render.createMaterial("#009bf5")
-    const box = Render.createBox(new Vector3(10, 20, 30), mat)
-    this.scene.add(box)
-    console.log(this.scene)
+    const mat = Render.createMaterial("black")
+    const dot = Render.createSphere(new Vector3(), 0.1, mat)
+    this.scene.add(dot)
   }
 
   private setupLighting() {
