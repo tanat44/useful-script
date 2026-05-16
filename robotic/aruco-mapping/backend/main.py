@@ -5,13 +5,12 @@ import json
 from dataclasses import asdict
 import paho.mqtt.client as paho
 
-from fps_counter import FpsCounter
 from data.markers import Marker, RecogMarkers
 from data.vector3 import Vector3
 
 
 # load camera param
-data = np.load('../camera-calibrate/macairm2.npy', allow_pickle=True).item()
+data = np.load('../../../python/camera-calibrate/macairm2.npy', allow_pickle=True).item()
 camera_matrix, dist_coefs = data['camera_matrix'], data['dist_coefs']
 
 # marker
@@ -24,7 +23,6 @@ MARKER_POINTS = np.array([[-MARKER_LENGTH/2, MARKER_LENGTH/2, 0],
 # start
 dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_6X6_250)
 detector_params = cv.aruco.DetectorParameters()
-fps_counter = FpsCounter()
 cap = cv.VideoCapture("video.mov")
 if not cap.isOpened():
     print("Cannot open camera")
@@ -42,10 +40,8 @@ mqtt.connect("localhost", 1883)
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
-    print(time)
     time += frame_time
     frame = cv.undistort(frame, camera_matrix, dist_coefs)
-    fps = fps_counter.tick()
     cv.putText(frame, "{:.2f}".format(fps), np.array(
         [10, 30]), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
