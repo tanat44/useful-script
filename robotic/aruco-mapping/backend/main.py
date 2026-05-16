@@ -3,6 +3,7 @@ import numpy as np
 import cv2 as cv
 import json
 from dataclasses import asdict
+import paho.mqtt.client as paho
 
 from fps_counter import FpsCounter
 from data.markers import Marker, RecogMarkers
@@ -24,14 +25,19 @@ MARKER_POINTS = np.array([[-MARKER_LENGTH/2, MARKER_LENGTH/2, 0],
 dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_6X6_250)
 detector_params = cv.aruco.DetectorParameters()
 fps_counter = FpsCounter()
-
 cap = cv.VideoCapture("video.mov")
 if not cap.isOpened():
     print("Cannot open camera")
     exit()
-fps = cap.get(cv.CAP_PROP_FPS);
+fps = cap.get(cv.CAP_PROP_FPS)
 frame_time = 1/fps
 time = 0
+
+# mqtt
+mqtt = paho.Client(client_id="video_reader",
+                   userdata=None, protocol=paho.MQTTv5)
+mqtt.username_pw_set("hello", "test")
+mqtt.connect("localhost", 1883)
 
 while True:
     # Capture frame-by-frame
@@ -67,13 +73,10 @@ while True:
             continue
         marker = Marker(id, tran.flatten(), rot.flatten(), 123.0)
         markers.append(marker)
-        # rot = np.rad2deg(rot.flatten()).astype(np.int32)
-        # tran = tran.flatten().astype(np.int32)
-        # print(
-        #     f'rot[{rot[0]} {rot[1]} {rot[2]}]\ttran[{tran[0]} {tran[1]} {tran[2]}]\tw{corners[0][0]-corners[1][0]}')
 
     recog_marker = RecogMarkers(time, markers)
-    print(json.dumps(asdict(recog_marker)))
+    payload = json.dumps(asdict(recog_marker))
+    mqtt.publish("aruco", payload=payload, qos=0)  # qos = 0 fire and forget
 
     cv.imshow('aruco playback', frame)
 
