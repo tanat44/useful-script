@@ -9,7 +9,8 @@ import { Event } from "./event/Event"
 import type { EventBase } from "./event/EventBase"
 import type { EventType } from "./event/types"
 import { Origin } from "./objects/Origin"
-import { OrthoCamera } from "./OrthoCamera"
+import { PCamera } from "./PCamera"
+import { Render } from "./Render"
 
 // unit in meters
 export class Visualizer {
@@ -20,18 +21,19 @@ export class Visualizer {
   private speed!: number
   private pausing: boolean
 
+  container: HTMLDivElement
   canvas: HTMLCanvasElement
-  orthoCamera!: OrthoCamera
+  camera!: PCamera
   scene!: Scene
-  text: Text
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas
+  constructor(container: HTMLDivElement) {
+    this.container = container
+    this.canvas = document.createElement("canvas")
+    this.container.appendChild(this.canvas)
     this.setupScene()
     this.setupLighting()
 
     this.event = new Event(this.canvas)
-    this.text = new Text(this)
     this.pausing = false
 
     this.createObjects()
@@ -56,7 +58,8 @@ export class Visualizer {
   private async createObjects() {
     // await this.text.load()
     const origin = new Origin()
-    this.scene.add(...origin.objects)
+    const gridHelper = Render.gridHelper()
+    this.scene.add(...origin.objects, gridHelper)
   }
 
   private setupLighting() {
@@ -73,23 +76,29 @@ export class Visualizer {
     // scene
     this.scene = new Scene()
     this.scene.background = new Color(0xf0f0f0)
-
-    // const gridHelper = new GridHelper(100, 10);
-    // gridHelper.rotateX(Math.PI / 2);
-    // this.scene.add(gridHelper);
-
     this.renderer = new WebGLRenderer({ antialias: true, canvas: this.canvas })
     this.renderer.setPixelRatio(window.devicePixelRatio)
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer.shadowMap.enabled = true
+    this.canvas.addEventListener("contextmenu", (e) => e.preventDefault())
+    window.addEventListener("resize", this.onWindowResize.bind(this))
 
     // camera
-    this.orthoCamera = new OrthoCamera(this)
-    this.scene.add(this.orthoCamera.camera)
+    this.camera = new PCamera(this)
+
+    this.onWindowResize()
+  }
+
+  private onWindowResize(): void {
+    const w = this.container.clientWidth
+    const h = this.container.clientHeight
+    this.canvas.width = w
+    this.canvas.height = h
+    this.renderer.setSize(w, h)
+    this.camera.onWindowResize(w, h)
   }
 
   public render() {
-    this.renderer.render(this.scene, this.orthoCamera.camera)
+    this.renderer.render(this.scene, this.camera.camera)
   }
 
   private animate() {

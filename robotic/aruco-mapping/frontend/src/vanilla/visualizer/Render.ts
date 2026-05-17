@@ -3,6 +3,7 @@ import {
   BoxGeometry,
   BufferGeometry,
   FrontSide,
+  GridHelper,
   Line,
   LineBasicMaterial,
   Material,
@@ -81,5 +82,14 @@ export class Render {
     const sphere = new Mesh(geometry, Render.getMaterial(color)!)
     sphere.position.set(pos.x, pos.y, pos.z)
     return sphere
+  }
+
+  static gridHelper() {
+    const size = 10
+    const divisions = 10
+    const object = new GridHelper(size, divisions)
+    object.rotateX(Math.PI / 2)
+
+    return object
   }
 }

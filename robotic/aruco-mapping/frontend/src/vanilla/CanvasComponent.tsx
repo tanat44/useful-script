@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react"
 import { useVanillaContextStore } from "./store"
 
 export function CanvasComponent() {
-  const ref = useRef<HTMLCanvasElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (ref?.current === null) return
@@ -12,5 +12,5 @@ export function CanvasComponent() {
     useVanillaContextStore.getState().createContext(ref.current)
   }, [ref])
 
-  return <canvas ref={ref} className="size-full"></canvas>
+  return <div ref={ref} className="size-full" />
 }

@@ -5,8 +5,8 @@ export class Context {
   mqtt: MqttClient
   visualizer: Visualizer
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.visualizer = new Visualizer(canvas)
+  constructor(container: HTMLDivElement) {
+    this.visualizer = new Visualizer(container)
     this.mqtt = new MqttClient(this)
   }
 }

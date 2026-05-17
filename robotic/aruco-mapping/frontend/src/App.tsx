@@ -3,7 +3,7 @@ import { CanvasComponent } from "./vanilla"
 
 export function App() {
   return (
-    <div>
+    <div className="flex size-full flex-col">
       <CanvasComponent />
       <OverlayUi />
     </div>
