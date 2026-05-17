@@ -37,7 +37,7 @@ export class OrthoOrbit {
     })
     this.domElement.addEventListener("contextmenu", (e) => e.preventDefault())
     window.addEventListener("resize", this.onWindowResize.bind(this))
-    this.updateZoom(0.005)
+    this.updateZoom(0.05)
   }
 
   render() {}
@@ -113,6 +113,11 @@ export class OrthoOrbit {
     const sceneBox = new Box3().setFromObject(this.visualizer.scene)
     const low = sceneBox.min
     const high = sceneBox.max
+
+    if (sceneBox.isEmpty()) {
+      low.set(-10, -10, -10)
+      high.set(10, 10, 10)
+    }
 
     const corners: Vector3[] = [
       new Vector3(low.x, low.y, low.z),

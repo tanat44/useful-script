@@ -3,15 +3,13 @@ import {
   Color,
   DirectionalLight,
   Scene,
-  Vector3,
   WebGLRenderer,
 } from "three"
 import { Event } from "./event/Event"
 import type { EventBase } from "./event/EventBase"
 import type { EventType } from "./event/types"
+import { Origin } from "./objects/Origin"
 import { OrthoCamera } from "./OrthoCamera"
-import { Render } from "./Render"
-import { Text } from "./Text"
 
 // unit in meters
 export class Visualizer {
@@ -57,9 +55,8 @@ export class Visualizer {
 
   private async createObjects() {
     // await this.text.load()
-    const mat = Render.createMaterial("black")
-    const dot = Render.createSphere(new Vector3(), 0.1, mat)
-    this.scene.add(dot)
+    const origin = new Origin()
+    this.scene.add(...origin.objects)
   }
 
   private setupLighting() {

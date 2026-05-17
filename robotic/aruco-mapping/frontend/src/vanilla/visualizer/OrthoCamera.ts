@@ -9,9 +9,10 @@ export class OrthoCamera {
   constructor(visualizer: Visualizer) {
     // camera
     this.camera = new OrthographicCamera()
-    this.camera.position.set(-10, -20, 5)
+    this.camera.position.set(-1, -2, 1)
     this.camera.up.set(0, 0, 1)
     this.camera.lookAt(0, 0, 0)
+    this.camera.position.z += 3
 
     // orbit
     this.orbit = new OrthoOrbit(this.camera, visualizer)

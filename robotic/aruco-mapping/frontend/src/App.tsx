@@ -1,18 +1,12 @@
-import { useEffect } from "react"
-import { VisualizerComponent } from "./components/visualizer/VisualizerComponent"
-import { useMqtt } from "./lib/mqtt/store"
+import { OverlayUi } from "./components/OverlayUi"
+import { CanvasComponent } from "./vanilla"
 
 export function App() {
-  const { connect } = useMqtt()
-
-  useEffect(() => {
-    connect()
-  }, [])
-
   return (
-    <>
-      <VisualizerComponent />
-    </>
+    <div>
+      <CanvasComponent />
+      <OverlayUi />
+    </div>
   )
 }
 

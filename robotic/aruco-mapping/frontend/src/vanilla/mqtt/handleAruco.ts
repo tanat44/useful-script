@@ -1,6 +1,6 @@
-import { Render } from "@/components/visualizer/Render"
-import { useVisualizerStore } from "@/components/visualizer/store"
+import { Render } from "@/vanilla/visualizer/Render"
 import { Vector3 } from "three"
+import type { Context } from "../Context"
 
 const MARKER_MAT = Render.createMaterial("#f87171")
 const MARKER_SIZE = new Vector3(0.09, 0.01, 0.09)
@@ -21,10 +21,10 @@ type Marker = {
   rot: _Vector
 }
 
-export function handleAruco(message: string) {
+export function handleAruco(context: Context, message: string) {
   const data = JSON.parse(message) as RecogMarkers
 
-  const viz = useVisualizerStore.getState().visualizerRef
+  const viz = context.visualizer
   if (!viz) return
 
   data.markers.forEach((marker) => {
