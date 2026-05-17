@@ -1,26 +1,41 @@
 import {
   Box3,
+  Euler,
+  Matrix4,
   PerspectiveCamera,
   Plane,
+  Quaternion,
   Raycaster,
   Vector2,
   Vector3,
 } from "three"
 import type { Visualizer } from "./Visualizer"
 
+enum Mode {
+  None,
+  Drag,
+  Orbit,
+}
+
+const PAN_SPEED = 10
+const ORBIT_SPEED = 1
+
 export class PCamera {
   visualizer: Visualizer
   camera: PerspectiveCamera
   rayCaster: Raycaster = new Raycaster()
-  cameraStartWorld: Vector3 = new Vector3()
+  cameraStartPos: Vector3 = new Vector3()
+  cameraStartMatrix: Matrix4 = new Matrix4()
+  cameraStartQuaternion: Quaternion = new Quaternion()
   mouseDownScreen?: Vector2
-  viewCenterWorld?: Vector3
+  focalPoint?: Vector3
   zoom: number = 1
+  currentMode: Mode = Mode.None
 
   constructor(visualizer: Visualizer) {
     this.visualizer = visualizer
     // camera
-    this.camera = new PerspectiveCamera(50)
+    this.camera = new PerspectiveCamera(50, 1, 0.0001, 1000)
     this.camera.position.set(-2, -4, 1.6)
     this.camera.up.set(0, 0, 1)
     this.camera.lookAt(0, 0, 1.6)
@@ -40,58 +55,77 @@ export class PCamera {
 
   private onMouseDown(event: MouseEvent): void {
     this.mouseDownScreen = this.getMouseScreenPosition(event)
-    this.viewCenterWorld = this.findGroundIntersection(new Vector2())
-    this.cameraStartWorld = this.camera.position.clone()
+    this.focalPoint = this.findGroundIntersection(this.mouseDownScreen)
+    this.cameraStartPos = this.camera.position.clone()
+    this.cameraStartMatrix = this.camera.matrixWorld.clone()
+    this.cameraStartQuaternion = this.camera.quaternion.clone()
+
+    const button = event.buttons
+    if (button === 0) this.currentMode = Mode.None
+    else if (button === 1) this.currentMode = Mode.Drag
+    else if (button === 2) this.currentMode = Mode.Orbit
   }
 
   private onMouseMove(event: MouseEvent): void {
-    // if (!this.mouseDownPos) return
-    // const newScreenPos = this.getMouseScreenPosition(event)
-    // const newWorldPos = this.unproject(newScreenPos)
-    // if (!newWorldPos) return
-    // const button = event.buttons
-    // let moved = false
-    // // left click = rotate
-    // if (button == 1) {
-    //   const screenMove = newScreenPos.clone().sub(this.mouseDownPos)
-    //   // yaw
-    //   const YAW_SPEED = 5
-    //   const rotYaw = new Quaternion()
-    //   rotYaw.setFromAxisAngle(new Vector3(0, 0, 1), -screenMove.x * YAW_SPEED)
-    //   const newPos = this.cameraStartPos.clone().applyQuaternion(rotYaw)
-    //   // pitch
-    //   const PITCH_SPEED = 40
-    //   newPos.z += (-screenMove.y * PITCH_SPEED) / Math.sqrt(this.zoom)
-    //   // apply
-    //   this.camera.position.copy(newPos)
-    //   if (this.viewCenter) {
-    //     this.camera.lookAt(this.viewCenter)
-    //   } else this.camera.lookAt(new Vector3())
-    //   moved = true
-    //   // right click = pan
-    // } else if (button == 2) {
-    //   const move = newWorldPos
-    //     .clone()
-    //     .sub(this.unproject(this.mouseDownPos))
-    //     .multiplyScalar(2)
-    //   const newCamera = this.cameraStartPos
-    //     .clone()
-    //     .sub(move)
-    //     .normalize()
-    //     .multiplyScalar(ORBIT_RADIUS)
-    //   this.camera.position.set(newCamera.x, newCamera.y, newCamera.z)
-    //   moved = true
-    // }
-    // this.updateNearFar()
-    // this.camera.updateProjectionMatrix()
-    // if (moved) {
-    //   const direction = new Vector3(0, 0, -1).applyQuaternion(
-    //     this.camera.quaternion
-    //   )
-    //   this.visualizer.emit(
-    //     new CameraMoveEvent(this.camera.position.clone(), direction)
-    //   )
-    // }
+    if (this.currentMode === Mode.None || !this.mouseDownScreen) return
+
+    const screenPos = this.getMouseScreenPosition(event)
+    const delta = screenPos.clone().sub(this.mouseDownScreen)
+
+    if (this.currentMode === Mode.Drag && this.focalPoint) {
+      // const a = new Vector3(screenPos.x, screenPos.y, 1).unproject(this.camera)
+      // const intersect = new Vector3()
+
+      // const found = new Plane(new Vector3(0, 0, 1)).intersectLine(
+      //   new Line3(this.camera.position, a),
+      //   intersect
+      // )
+      // if (!found) return
+      // const moveWorld = intersect
+      //   .clone()
+      //   .sub(this.focalPoint)
+      //   .multiplyScalar(-1)
+      // const cameraPos = this.cameraStartPos
+      //   .clone()
+      //   .add(moveWorld)
+      // this.camera.position.copy(cameraPos)
+      const moveRight = new Vector3(1, 0, 0)
+        .applyQuaternion(this.cameraStartQuaternion)
+        .projectOnPlane(new Vector3(0, 0, 1))
+        .normalize()
+        .multiplyScalar(delta.x * -1)
+
+      const moveUp = new Vector3(0, 0, 1)
+        .applyQuaternion(this.cameraStartQuaternion)
+        .projectOnPlane(new Vector3(0, 0, 1))
+        .normalize()
+        .multiplyScalar(delta.y)
+
+      const moveWorld = moveRight.clone().add(moveUp).multiplyScalar(PAN_SPEED)
+      const cameraPos = this.cameraStartPos.clone().add(moveWorld)
+      this.camera.position.copy(cameraPos)
+    } else if (this.currentMode === Mode.Orbit && this.focalPoint) {
+      // rotate
+      const euler = new Euler()
+      euler.setFromQuaternion(this.cameraStartQuaternion)
+      const pitch = delta.y * ORBIT_SPEED + euler.x
+      const x = new Vector3(1, 0, 0)
+      const qPitch = new Quaternion().setFromAxisAngle(x, pitch)
+      const yaw = -delta.x * ORBIT_SPEED + euler.y
+      const qYaw = new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), yaw)
+
+      const qNew = new Quaternion().multiply(qYaw).multiply(qPitch)
+      this.camera.quaternion.copy(qNew)
+
+      // translate
+      const dq = qNew
+        .clone()
+        .multiply(this.cameraStartQuaternion.clone().invert())
+      const posNew = this.cameraStartPos.clone().sub(this.focalPoint)
+      posNew.applyQuaternion(dq).add(this.focalPoint)
+      this.camera.position.copy(posNew)
+    }
+    this.camera.updateProjectionMatrix()
   }
 
   private updateNearFar(): void {
@@ -127,6 +161,7 @@ export class PCamera {
 
   private onMouseUp(_event: MouseEvent): void {
     this.mouseDownScreen = undefined
+    this.focalPoint = undefined
   }
 
   private onWheel(event: WheelEvent): void {
@@ -140,24 +175,19 @@ export class PCamera {
     this.updateZoom(zoom, this.getMouseScreenPosition(event))
   }
 
-  private unproject(screenPos: Vector2): Vector3 {
-    return new Vector3(screenPos.x, screenPos.y, 1).unproject(this.camera)
-  }
-
   private getMouseScreenPosition(event: MouseEvent | WheelEvent): Vector2 {
     const mousePosition = new Vector2()
     const canvas = this.visualizer.canvas
 
     mousePosition.x =
-      (event.clientX - canvas.offsetLeft) / canvas.offsetWidth - 1
+      ((event.clientX - canvas.offsetLeft) / canvas.clientWidth) * 2 - 1
     mousePosition.y =
-      -((event.clientY - canvas.offsetTop) / canvas.offsetHeight) + 1
+      ((event.clientY - canvas.offsetTop) / canvas.clientHeight) * -2 + 1
     return mousePosition
   }
 
   private findGroundIntersection(screenPosition: Vector2): Vector3 | undefined {
     this.rayCaster.setFromCamera(screenPosition.clone(), this.camera)
-
     const point = new Vector3()
     if (
       !this.rayCaster.ray.intersectPlane(
@@ -172,30 +202,9 @@ export class PCamera {
     return point
   }
 
-  updateZoom(zoom: number, center?: Vector2): void {
-    const aspect = window.innerWidth / window.innerHeight
-
-    // if (center) {
-    //   const oldPos = this.getMouseWorldPosition(center);
-    //   if (!oldPos) return;
-    //   const newCenter = center.multiplyScalar(zoom / this.zoom);
-    //   const newPos = this.getMouseWorldPosition(newCenter);
-    //   if (!newPos) return;
-    //   const move = newPos.sub(oldPos);
-    //   const newCameraPos = this.camera.position
-    //     .clone()
-    //     .sub(move)
-    //     .normalize()
-    //     .multiplyScalar(ORBIT_RADIUS);
-    //   this.camera.position.set(newCameraPos.x, newCameraPos.y, newCameraPos.z);
-    // }
-    this.zoom = zoom
-    this.updateNearFar()
-    this.camera.updateProjectionMatrix()
-  }
+  updateZoom(zoom: number, center?: Vector2): void {}
 
   onWindowResize(width: number, height: number): void {
-    console.log("a", width, height)
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
   }

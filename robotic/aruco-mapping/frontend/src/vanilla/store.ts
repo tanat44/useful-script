@@ -6,7 +6,7 @@ import type { Visualizer } from "./visualizer/Visualizer"
 interface State {
   context?: Context
   connected: boolean
-  createContext: (canvas: HTMLCanvasElement) => void
+  createContext: (container: HTMLDivElement) => void
   getVisualizer: () => Visualizer | undefined
   getMqttClient: () => MqttClient | undefined
 }
@@ -18,9 +18,9 @@ const initState = {
 
 export const useVanillaContextStore = create<State>()((set, get) => ({
   ...initState,
-  createContext: (canvas: HTMLCanvasElement) =>
+  createContext: (container: HTMLDivElement) =>
     set(() => {
-      return { context: new Context(canvas) }
+      return { context: new Context(container) }
     }),
   getVisualizer: () => get().context?.visualizer,
   getMqttClient: () => get().context?.mqtt,

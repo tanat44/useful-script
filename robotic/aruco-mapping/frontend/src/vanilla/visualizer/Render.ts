@@ -87,7 +87,7 @@ export class Render {
   static gridHelper() {
     const size = 10
     const divisions = 10
-    const object = new GridHelper(size, divisions)
+    const object = new GridHelper(size, divisions, 0xc0c0c0, 0xc0c0c0)
     object.rotateX(Math.PI / 2)
 
     return object

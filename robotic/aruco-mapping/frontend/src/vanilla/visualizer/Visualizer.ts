@@ -59,6 +59,7 @@ export class Visualizer {
     // await this.text.load()
     const origin = new Origin()
     const gridHelper = Render.gridHelper()
+    gridHelper.position.set(0, 0, -0.01)
     this.scene.add(...origin.objects, gridHelper)
   }
 
