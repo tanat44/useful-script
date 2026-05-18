@@ -4,9 +4,11 @@ services:
     # image: ros:jazzy-ros-core  
     # image: osrf/ros:jazzy-desktop
     build: .
-    ports:
-      - 11311:11311
-      - 11511:11511
     environment:
       - ROS_DOMAIN_ID=44
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - CYCLONEDDS_URI=/cyclonedds.xml
     command: tail -F /dev/null
+    volumes:
+      - ./cyclonedds.xml:/cyclonedds.xml
+    network_mode: host
