@@ -1,0 +1,12 @@
+services:
+  ros:
+    container_name: rosdev
+    # image: ros:jazzy-ros-core  
+    # image: osrf/ros:jazzy-desktop
+    build: .
+    ports:
+      - 11311:11311
+      - 11511:11511
+    environment:
+      - ROS_DOMAIN_ID=44
+    command: tail -F /dev/null
