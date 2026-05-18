@@ -7,7 +7,7 @@ services:
     environment:
       - ROS_DOMAIN_ID=44
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-      - CYCLONEDDS_URI=/cyclonedds.xml
+      - CYCLONEDDS_URI=file:///cyclonedds.xml
     command: tail -F /dev/null
     volumes:
       - ./cyclonedds.xml:/cyclonedds.xml
