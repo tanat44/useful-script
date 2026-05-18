@@ -2,7 +2,8 @@
     <Domain Id="any">
          <General>
            <Interfaces>
-              <NetworkInterface address="192.168.178.234"  multicast="false" />
+              <!-- <NetworkInterface address="192.168.178.234" multicast="false" /> -->
+              <NetworkInterface name="lo" multicast="false" />
            </Interfaces>
            <AllowMulticast>false</AllowMulticast>
            <EnableMulticastLoopback>false</EnableMulticastLoopback>
