@@ -4,11 +4,17 @@ services:
     # image: ros:jazzy-ros-core  
     # image: osrf/ros:jazzy-desktop
     build: .
+    
     environment:
       - ROS_DOMAIN_ID=44
-      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-      - CYCLONEDDS_URI=file:///cyclonedds.xml
+      # - RMW_IMPLEMENTATION=rmw_zenoh_cpp        # for zenoh client
+      # - ZENOH_CONFIG_OVERRIDE='mode="client";connect/endpoints=["tcp/${192.168.178.52}:7447"]'      # for zenoh client
+      # - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp # for cyclone dds
+      # - CYCLONEDDS_URI=file:///cyclonedds.xml # for cyclone dds
+
     command: tail -F /dev/null
-    volumes:
-      - ./cyclonedds.xml:/cyclonedds.xml
+
+    # volumes:
+      # - ./cyclonedds.xml:/cyclonedds.xml      # for cyclone dds
+
     network_mode: host
