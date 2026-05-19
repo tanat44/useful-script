@@ -23,7 +23,7 @@ ros2 run rmw_zenoh_cpp rmw_zenohd
 on zenoh client node
 ```sh
 export RMW_IMPLEMENTATION=rmw_zenoh_cpp
-export ZENOH_CONFIG_OVERRIDE='mode="client";connect/endpoints=["tcp/${192.168.178.52}:7447"]'
+export ZENOH_CONFIG_OVERRIDE='mode="client";connect/endpoints=["tcp/192.168.178.52:7447"]'
 # do what you want
 ```
 
