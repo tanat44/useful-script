@@ -68,7 +68,7 @@ export class Visualizer {
     this.scene.add(ambientLight)
 
     const directionalLight = new DirectionalLight(0xffffff, 2)
-    directionalLight.position.set(5, 5, 5)
+    directionalLight.position.set(-5, -5, 5)
     directionalLight.castShadow = true
     this.scene.add(directionalLight)
   }

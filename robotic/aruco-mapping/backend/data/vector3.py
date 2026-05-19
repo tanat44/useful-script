@@ -9,5 +9,5 @@ class Vector3:
 
   def __init__(self, np_array: np.ndarray):
     self.x = np_array[0].item()
-    self.y = np_array[1].item()
-    self.z = np_array[2].item()
+    self.y = np_array[2].item()
+    self.z = np_array[1].item()

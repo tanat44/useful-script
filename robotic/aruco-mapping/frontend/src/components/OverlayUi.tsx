@@ -1,11 +1,17 @@
 import { ConnectionStatus } from "./ConnectionStatus"
-import { VideoRestartButton } from "./VideoRestartButton"
+import { PlaybackLiveButton } from "./PlaybackLiveButton"
+import { PlaybackPauseButton } from "./PlaybackPauseButton"
+import { PlaybackStartButton } from "./PlaybackStartButton"
+import { PlaybackUnpauseButton } from "./PlaybackUnpauseButton"
 
 export function OverlayUi() {
   return (
-    <div className="absolute top-0 left-0 flex flex-row gap-2 p-2">
+    <div className="absolute top-0 left-0 flex flex-row gap-1 p-2">
       <ConnectionStatus />
-      <VideoRestartButton />
+      <PlaybackLiveButton />
+      <PlaybackStartButton />
+      <PlaybackPauseButton />
+      <PlaybackUnpauseButton />
     </div>
   )
 }

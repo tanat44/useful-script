@@ -11,11 +11,7 @@ import {
 } from "three"
 import type { Visualizer } from "./Visualizer"
 
-enum Mode {
-  None,
-  Drag,
-  Orbit,
-}
+type Mode = "none" | "drag" | "orbit"
 
 const PAN_SPEED = 10
 const ORBIT_SPEED = 1
@@ -30,7 +26,7 @@ export class PCamera {
   mouseDownScreen?: Vector2
   focalPoint?: Vector3
   zoom: number = 1
-  currentMode: Mode = Mode.None
+  currentMode: Mode = "none"
 
   constructor(visualizer: Visualizer) {
     this.visualizer = visualizer
@@ -61,18 +57,18 @@ export class PCamera {
     this.cameraStartQuaternion = this.camera.quaternion.clone()
 
     const button = event.buttons
-    if (button === 0) this.currentMode = Mode.None
-    else if (button === 1) this.currentMode = Mode.Drag
-    else if (button === 2) this.currentMode = Mode.Orbit
+    if (button === 0) this.currentMode = "none"
+    else if (button === 1) this.currentMode = "drag"
+    else if (button === 2) this.currentMode = "orbit"
   }
 
   private onMouseMove(event: MouseEvent): void {
-    if (this.currentMode === Mode.None || !this.mouseDownScreen) return
+    if (this.currentMode === "none" || !this.mouseDownScreen) return
 
     const screenPos = this.getMouseScreenPosition(event)
     const delta = screenPos.clone().sub(this.mouseDownScreen)
 
-    if (this.currentMode === Mode.Drag && this.focalPoint) {
+    if (this.currentMode === "drag" && this.focalPoint) {
       // const a = new Vector3(screenPos.x, screenPos.y, 1).unproject(this.camera)
       // const intersect = new Vector3()
 
@@ -104,7 +100,7 @@ export class PCamera {
       const moveWorld = moveRight.clone().add(moveUp).multiplyScalar(PAN_SPEED)
       const cameraPos = this.cameraStartPos.clone().add(moveWorld)
       this.camera.position.copy(cameraPos)
-    } else if (this.currentMode === Mode.Orbit && this.focalPoint) {
+    } else if (this.currentMode === "orbit" && this.focalPoint) {
       // rotate
       const euler = new Euler()
       euler.setFromQuaternion(this.cameraStartQuaternion)
@@ -159,13 +155,14 @@ export class PCamera {
     this.camera.far = maxDistance
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onMouseUp(_event: MouseEvent): void {
     this.mouseDownScreen = undefined
     this.focalPoint = undefined
   }
 
   private onWheel(event: WheelEvent): void {
-    let y = event.deltaY
+    const y = event.deltaY
     let zoom = this.zoom
     if (y > 0) {
       zoom *= 1.1 // Zoom in
@@ -202,7 +199,8 @@ export class PCamera {
     return point
   }
 
-  updateZoom(zoom: number, center?: Vector2): void {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updateZoom(zoom: number, _center?: Vector2): void {}
 
   onWindowResize(width: number, height: number): void {
     this.camera.aspect = width / height

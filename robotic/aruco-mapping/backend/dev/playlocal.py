@@ -1,21 +1,20 @@
 import sys
 import numpy as np
 import cv2 as cv
-from fps_counter import FpsCounter
+import json
+from dataclasses import asdict
+import paho.mqtt.client as paho
 
-# camera param
-SENSOR_WIDTH = 2  # mm
-PIXEL_WIDTH = 1920
-PIXEL_HEIGHT = 1080
-FOV_HORIZONTAL = 60  # degree
-FMM = (SENSOR_WIDTH/2) / np.tan(np.deg2rad(FOV_HORIZONTAL/2))
-FX = FMM / (SENSOR_WIDTH/PIXEL_WIDTH)  # focal length in pixel
-INTRINSIC_MATRIX = np.array([[FX, 0, PIXEL_WIDTH/2],
-                             [0, FX, PIXEL_HEIGHT/2],
-                             [0, 0, 1]])
+from data.markers import Marker, RecogMarkers
+from data.vector3 import Vector3
+
+
+# load camera param
+data = np.load('../../../python/camera-calibrate/macairm2.npy', allow_pickle=True).item()
+camera_matrix, dist_coefs = data['camera_matrix'], data['dist_coefs']
 
 # marker
-MARKER_LENGTH = 60  # mm
+MARKER_LENGTH = 90  # mm
 MARKER_POINTS = np.array([[-MARKER_LENGTH/2, MARKER_LENGTH/2, 0],
                           [MARKER_LENGTH/2, MARKER_LENGTH/2, 0],
                           [MARKER_LENGTH/2, -MARKER_LENGTH/2, 0],
@@ -24,17 +23,25 @@ MARKER_POINTS = np.array([[-MARKER_LENGTH/2, MARKER_LENGTH/2, 0],
 # start
 dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_6X6_250)
 detector_params = cv.aruco.DetectorParameters()
-fps_counter = FpsCounter()
-
-cap = cv.VideoCapture(1)
+cap = cv.VideoCapture("video.mov")
 if not cap.isOpened():
     print("Cannot open camera")
     exit()
+fps = cap.get(cv.CAP_PROP_FPS)
+frame_time = 1/fps
+time = 0
+
+# mqtt
+mqtt = paho.Client(client_id="video_reader",
+                   userdata=None, protocol=paho.MQTTv5)
+mqtt.username_pw_set("hello", "test")
+mqtt.connect("localhost", 1883)
 
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
-    fps = fps_counter.tick()
+    time += frame_time
+    frame = cv.undistort(frame, camera_matrix, dist_coefs)
     cv.putText(frame, "{:.2f}".format(fps), np.array(
         [10, 30]), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
@@ -50,18 +57,24 @@ while True:
     marker_ids = results[1]
     cv.aruco.drawDetectedMarkers(frame, marker_corners, marker_ids)
 
-    if len(marker_corners) == 1:
-        # perspective n point
+    markers = []
+
+    for i in range(len(marker_corners)):
+        corners = marker_corners[i]
+        id = marker_ids[i][0].item()
         corners = marker_corners[0][0]
         success, rot, tran = cv.solvePnP(
-            MARKER_POINTS, corners, INTRINSIC_MATRIX, None)
-        if success:
-            rot = np.rad2deg(rot.flatten()).astype(np.int32)
-            tran = tran.flatten().astype(np.int32)
-            print(
-                f'rot[{rot[0]} {rot[1]} {rot[2]}]\ttran[{tran[0]} {tran[1]} {tran[2]}]\tw{corners[0][0]-corners[1][0]}')
+            MARKER_POINTS, corners, camera_matrix, None)
+        if not success:
+            continue
+        marker = Marker(id, tran.flatten()/1000, rot.flatten(), 123.0)
+        markers.append(marker)
 
-    cv.imshow('live aruco reader', frame)
+    recog_marker = RecogMarkers(time, markers)
+    payload = json.dumps(asdict(recog_marker))
+    mqtt.publish("aruco", payload=payload, qos=0)  # qos = 0 fire and forget
+
+    cv.imshow('aruco playback', frame)
 
     if cv.waitKey(1) == ord('q'):
         break

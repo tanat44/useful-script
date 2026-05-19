@@ -1,14 +1,14 @@
 import { useVanillaContextStore } from "@/vanilla"
 import { Button } from "./ui/button"
 
-export function VideoRestartButton() {
+export function PlaybackStartButton() {
   function handleClick() {
-    useVanillaContextStore.getState().getMqttClient()?.sendVideoRestart()
+    useVanillaContextStore.getState().getMqttClient()?.sendPlaybackStart()
   }
 
   return (
     <Button onClick={handleClick} variant="outline">
-      Restart Video
+      Start
     </Button>
   )
 }
