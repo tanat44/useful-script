@@ -1,12 +1,16 @@
 import asyncio
 import cv2
-from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
+from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack, RTCIceCandidate, RTCConfiguration, RTCIceServer
+from aioice import Candidate
 from aiortc.contrib.signaling import TcpSocketSignaling
 from av import VideoFrame
 import fractions
-from websockets.asyncio.client import connect
+from websockets.asyncio.client import connect, ClientConnection
 from datetime import datetime
 import json
+import dataclasses
+
+UUID = "01f13727-a543-4984-a427-fba53c5652be"
 
 
 class CustomVideoStreamTrack(VideoStreamTrack):
@@ -41,8 +45,16 @@ class CustomVideoStreamTrack(VideoStreamTrack):
         return video_frame
 
 
+async def created_description(pc: RTCPeerConnection, ws: ClientConnection, description: RTCSessionDescription):
+    await pc.setLocalDescription(description)
+    sdp_raw = dataclasses.asdict(description)
+    await ws.send(json.dumps({"sdp": sdp_raw, "uuid": UUID}))
+
+
 async def setup_webrtc_and_run(ip_address, port, camera_id):
-    pc = RTCPeerConnection()
+    config = RTCConfiguration(iceServers=[RTCIceServer(
+        urls="stun:stun.stunprotocol.org:3478"), RTCIceServer(urls="stun:stun.l.google.com:19302")])
+    pc = RTCPeerConnection(configuration=config)
     video_sender = CustomVideoStreamTrack(camera_id)
     pc.addTrack(video_sender)
 
@@ -60,17 +72,47 @@ async def setup_webrtc_and_run(ip_address, port, camera_id):
                 print("WebRTC connection established successfully")
 
         offer = await pc.createOffer()
-        await pc.setLocalDescription(offer)
-        sdp = {"type": offer.type, "sdp": offer.sdp}
-        payload = {"sdp": sdp, "uuid": "01f13727-a543-4984-a427-fba53c5652be"}
-        await ws.send(json.dumps(payload))
+        await created_description(pc, ws, offer)
 
         while True:
             obj = await ws.recv()
-            print(obj)
-            if isinstance(obj, RTCSessionDescription):
-                await pc.setRemoteDescription(obj)
+            signal = json.loads(obj)
+            if signal["uuid"] == UUID:
+                continue
+
+            if "sdp" in signal:
+                print("---got sdp---")
+
+                sd = RTCSessionDescription(**signal["sdp"])
+                await pc.setRemoteDescription(sd)
+
+                if sd.type != "offer":
+                    continue
+
+                print("---answer---")
+                answer = await pc.createAnswer()
+                await created_description(pc, ws, answer)
                 print("Remote description set")
+
+            elif "ice" in signal:
+                print("---got ice---")
+                raw_ice = signal["ice"]
+                x = Candidate.from_sdp(raw_ice["candidate"])
+                ice = RTCIceCandidate(
+                    component=x.component,
+                    foundation=x.foundation,
+                    ip=x.host,
+                    port=x.port,
+                    priority=x.priority,
+                    protocol=x.transport,
+                    relatedAddress=x.related_address,
+                    relatedPort=x.related_port,
+                    tcpType=x.tcptype,
+                    type=x.type,
+                    sdpMid=raw_ice["sdpMid"],
+                    sdpMLineIndex=raw_ice["sdpMLineIndex"]
+                )
+                await pc.addIceCandidate(ice)
             elif obj is None:
                 print("Signaling ended")
                 break
